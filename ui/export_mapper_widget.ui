@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>837</width>
+    <width>758</width>
     <height>409</height>
    </rect>
   </property>
@@ -14,19 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="2">
-    <widget class="QPushButton" name="checkForBSSChangesButton">
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Check for BSS Changes</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0">
     <widget class="QCheckBox" name="promptForNewFileCheck">
      <property name="toolTip">
@@ -40,7 +27,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="5">
     <widget class="QTreeWidget" name="exportMappingTree">
      <property name="toolTip">
       <string/>
@@ -91,7 +78,7 @@
      </column>
     </widget>
    </item>
-   <item row="2" column="3">
+   <item row="2" column="4">
     <widget class="QPushButton" name="openBSSFolderButton">
      <property name="maximumSize">
       <size>
@@ -104,7 +91,20 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="2" column="3">
+    <widget class="QPushButton" name="checkForBSSChangesButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Check for BSS Changes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
     <widget class="QPushButton" name="expandWholeTreeButton">
      <property name="maximumSize">
       <size>
@@ -114,6 +114,19 @@
      </property>
      <property name="text">
       <string>Expand Whole Tree</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="onlyOnChangesCheck">
+     <property name="toolTip">
+      <string>If unchecked, you can see this dialog again by clicking its app icon in windows.</string>
+     </property>
+     <property name="text">
+      <string>Export Only on Design Changes</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

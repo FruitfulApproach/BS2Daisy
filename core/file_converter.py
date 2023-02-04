@@ -1,6 +1,7 @@
 import core.exporter_thread
 import os
 import shutil
+from core.tag_converter import TagConverter
 
 class FileConverter:
    def __init__(self, in_file:str, process_opt:str, out_file:str):
@@ -32,4 +33,11 @@ class FileConverter:
             if not os.path.exists(directory):
                os.makedirs(directory)
             shutil.copyfile(self._infile, self._outfile)
+      elif self._processOption == 'BSS to Django':         
+         tag_converter = TagConverter(self.input_file)
+         
+         with open(self.output_file, 'w') as output_file:
+            output_file.write(tag_converter.convert(thread))
+         
+         
       

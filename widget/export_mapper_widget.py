@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QMainWindow
 from ui.ui_export_mapper_widget import Ui_ExportMapperWidget
 import os
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 from datetime import datetime
+from core.tools import standard_path
 
 class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    bss_assets_subfolders = {'bootstrap', 'js', 'css', 'img'}
@@ -36,6 +37,8 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self._bssDesignExport = data['bss root']
       self._lastExportTime = data['last import time']
       self.tree_from_dict(data['bss file tree'])      
+      self.onlyOnChangesCheck.setChecked(data['export changes only'])
+      self.promptForNewFileCheck.setChecked(data['prompt on new file'])
       self.finish_setup()
       
    def __getstate__(self):
@@ -43,14 +46,15 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          'django root' : self._djangoRoot,
          'bss root' : self._bssDesignExport,
          'last import time' : self._lastExportTime,
-         'bss file tree' : self.tree_to_dict()
+         'bss file tree' : self.tree_to_dict(),
+         'export changes only' : self.onlyOnChangesCheck.isChecked(),
+         'prompt on new file' : self.promptForNewFileCheck.isChecked(),
       }
    
    def finish_setup(self):
       self.openBSSFolderButton.clicked.connect(lambda: os.startfile(self.bss_design_root))
       self.checkForBSSChangesButton.clicked.connect(self.check_for_bss_file_structure_changes)
       self.expandWholeTreeButton.clicked.connect(self.exportMappingTree.expandAll)
-      self.load_any_new_bss_files()
    
    def create_new_bss_tree_item(self, filename:str) -> QTreeWidgetItem:
       process_combo = QComboBox()
@@ -96,7 +100,15 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self.exportMappingTree.setItemWidget(item, self.ProcessOption, process_combo)   
       self.exportMappingTree.setItemWidget(item, self.OutputFile, output_line)
       self.exportMappingTree.setItemWidget(item, self.FileChanges, change_label)
-      self.file_added.emit(filename)
+      
+      #self.file_added.emit(filename)
+      
+      # HACKFIX: file_added signal isn't working and QCoreApplication.processEvents() does nothing to fix that.
+      
+      if self.promptForNewFileCheck.isChecked():
+         app = QApplication.instance()
+         app.main_window.show()
+         app.main_window.raise_()
       
       return item
    
@@ -104,15 +116,18 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       bss_root = self._bssDesignExport      
       if bss_root:
          self._ignoreBSSFiles = set(os.path.join(bss_root, ignored) for ignored in self.default_ignore_bss_files)
-         for root, directories, files in os.walk(bss_root):         
+         for root, directories, files in os.walk(bss_root):    
+            root = standard_path(root, sep=os.sep)
+            
             for directory in directories:
-               directory = os.path.join(root, directory)
+               directory = standard_path(os.path.join(root, directory), os.sep)
                if directory not in self._bssFileToTreeItem:
-                  self.create_new_bss_tree_item(os.path.join(root, directory))               
+                  self.create_new_bss_tree_item(directory)    
+                  
             for file in files:
-               file = os.path.join(root, file)
+               file = standard_path(os.path.join(root, file), os.sep)
                if file not in self._bssFileToTreeItem:
-                  self.create_new_bss_tree_item(os.path.join(root, file))
+                  self.create_new_bss_tree_item(file)
                
    def bss_item_process_changed(self, item, filename, process:str):
       if process == 'Ignore':
@@ -197,8 +212,13 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       return self._djangoRoot
    
    def django_output_file_mapping(self, bss_file:str):
+      
+         
       item = self._bssFileToTreeItem[bss_file]
       line_edit = self.exportMappingTree.itemWidget(item, self.OutputFile)
+      if os.path.basename(bss_file) == 'untitled.html':
+         print("DEBUG")
+         print(line_edit.text())
       return os.path.join(self.django_project_root, line_edit.text())
    
    def check_for_bss_file_structure_changes(self):
@@ -217,13 +237,16 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def django_output_line_edited(self, filename, text):
       item = self._bssFileToTreeItem[filename]
       
-      if text != item.current_text:
-         prior_django_file = os.path.join(self.django_project_root, item.current_file)
+      output_line:QLineEdit = self.exportMappingTree.itemWidget(item, self.OutputFile)
+      
+      if text != output_line.current_text:
+         prior_django_file = os.path.join(self.django_project_root, output_line.current_text)
          
          if os.path.exists(prior_django_file):
             self.remove_file_or_folder(prior_django_file)
             
-         item.current_text = text
+         output_line.current_text = text
+         output_line.setText(text)
          
    def set_django_root(self, root:str):
       if root != self._djangoRoot:
@@ -243,8 +266,20 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def prompt_for_each_new_file(self):
       return self.promptForNewFileCheck.isChecked()
    
-   def bss_input_files(self):
-      return self._bssFileToTreeItem.keys()
+   def bss_input_files(self, changes_only:bool=None):
+      if changes_only is None:
+         changes_only = self.onlyOnChangesCheck.isChecked()
+         
+      if not changes_only:
+         return self._bssFileToTreeItem.keys()
+      
+      files = []
+      
+      for file in self._bssFileToTreeItem.keys():
+         if self.modification_date(file) > self._lastExportTime:
+            files.append(file)
+            
+      return files
    
    def bss_to_django_process_option(self, filename:str) -> str:
       item = self._bssFileToTreeItem[filename]
@@ -313,7 +348,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       output_line.setText(self.default_file_output_path(path))
       output_line.current_text = output_line.text()
       output_line.textEdited.connect(lambda text: self.django_output_line_edited(path, text))      
-      item = QTreeWidgetItem([infile, None, None, None])
+      item = QTreeWidgetItem([infile, None, None, None])      
       process_combo.currentTextChanged.connect(lambda text: self.bss_item_process_changed(item, path, process=text))
       self._bssFileToTreeItem[path] = item
       return item, process_combo, output_line
@@ -329,3 +364,17 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def set_last_export_time(self, time:datetime):
       self._lastExportTime = time
+      
+   def handle_file_exported_result(self, filename:str, result:str):
+      item = self._bssFileToTreeItem[filename]
+      changes_label:QLabel = self.exportMappingTree.itemWidget(item, self.FileChanges)
+      
+      if changes_label is None:
+         changes_label = QLabel()         
+      
+      if result == "success":
+         changes_label.setPixmap(QPixmap(':/images/img/icons/success-24x24.ico'))
+      elif result == "error":
+         changes_label.setPixmap(QPixmap(':/images/img/icons/error-24x24.ico'))
+         
+      self.exportMappingTree.setItemWidget(item, self.FileChanges, changes_label)

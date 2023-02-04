@@ -9,6 +9,7 @@ from widget.export_mapper_widget import ExportMapperWidget
 from core.exporter_thread import ExporterThread
 from core.file_converter import FileConverter
 from datetime import datetime
+from core.tools import standard_path
 
 class MainWindow(Ui_MainWindow, QMainWindow):   
    def __init__(self, pickled=False):
@@ -36,22 +37,22 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       self.tabs.insertTab(1, self._exportMapper, "Export Mapping")
       self._exportMapper.file_added.connect(self.prompt_user_about_new_file)
       
-      if len(sys.argv) < 2:
-         self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 10000, 'color:red')
-         self._bssDesignExport = None
-         self.tabs.setCurrentWidget(self.gettingStartedTab)
-      else:
-         if not os.path.exists(sys.argv[1]):
-            os.makedirs(sys.argv[1])
-            
-         if os.path.isdir(sys.argv[1]):
-            bss_root = os.path.abspath(sys.argv[1])
-            self._exportMapper.set_bss_root(bss_root)
-            self.log_status_message(f'This app called with argument {os.path.relpath(bss_root)}.', 5000, 'color:blue')
-            self.tabs.setCurrentWidget(self._exportMapper)
-            #self._exportMapper.load_any_new_bss_files()
+      if self.export_mapper.bss_design_root is None:
+         if len(sys.argv) < 2:
+            self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 50000)
+            self.tabs.setCurrentWidget(self.gettingStartedTab)
          else:
-            self.log_status_message(f"{sys.argv[1]} is not a directory.", 10000, 'color:red')      
+            if not os.path.exists(sys.argv[1]):
+               os.makedirs(sys.argv[1])
+               
+            if os.path.isdir(sys.argv[1]):
+               bss_root = standard_path(os.path.abspath(sys.argv[1]), os.sep)
+               self.export_mapper.set_bss_root(bss_root)
+               self.log_status_message(f'This app called with argument {os.path.relpath(bss_root)}.', 5000, 'color:blue')
+               self.tabs.setCurrentWidget(self._exportMapper)
+               #self._exportMapper.load_any_new_bss_files()
+            else:
+               self.log_status_message(f"{sys.argv[1]} is not a directory.", 10000, 'color:red')      
             
       arg0 = sys.argv[0]
       exefile, ext = os.path.splitext(arg0)
@@ -61,6 +62,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       else:
          exefile = f'{exefile}.exe'
          
+      exefile = os.path.abspath(exefile)
       self.exeFilenameLine.setText(exefile)
       
       self.djangoProjectRootLine.setText(self._exportMapper.django_project_root)
@@ -82,7 +84,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       folder = QFileDialog.getExistingDirectory(parent=self, directory='.')
       
       if folder and os.path.exists(folder):
-         self.djangoProjectRootLine.setText(self.standard_path(folder, os.sep))
+         self.djangoProjectRootLine.setText(standard_path(folder, os.sep))
       
    def copy_exe_filename_clicked(self):
       QApplication.clipboard().setText(self.exeFilenameLine.text())
@@ -128,7 +130,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       return self._exportMapper.django_project_root
 
    @property
-   def export_mapper(self):
+   def export_mapper(self) -> ExportMapperWidget:
       return self._exportMapper
       
    @staticmethod   
@@ -137,7 +139,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       main_window = None
       
       if os.path.exists(bss_root):
-         config_file = MainWindow.standard_path(os.path.join(bss_root, '.bss-to-django-config.pkl'))
+         config_file = standard_path(os.path.join(bss_root, '.bss-to-django-config.pkl'))
          
          try:            
             with open(config_file, 'rb') as config_file:
@@ -156,14 +158,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          main_window.show()
          
       return main_window
-         
-   @staticmethod
-   def standard_path(filename:str, sep:str=None) -> str:
-      if sep is None:
-         sep = '/'
-      path = os.path.normpath(filename)
-      path = path.replace('\\', sep)
-      return path
    
    def start_export_thread(self):
       self.export_mapper.set_last_export_time(datetime.now())
@@ -171,7 +165,15 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       self._exportThread = ExporterThread(file_convs=self.file_converter_list(), parent=self)
       self._exportThread.finished.connect(self._exportThreadFinished)
       self._exportThread.progress_made.connect(self.exportProgress.setValue)
+      self._exportThread.file_exported.connect(self.handle_file_exported_result)
       self._exportThread.start()
+      
+   def handle_file_exported_result(self, filename:str, result:str):
+      self.export_mapper.handle_file_exported_result(filename, result)
+      
+      if not self.isVisible():
+         self.close()
+         QApplication.instance().quit()
       
    def _exportThreadFinished(self):
       self.runExporterButton.setEnabled(True)
@@ -186,7 +188,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       
       for infile in input_file_list:
          try:               
-            outfile = self.standard_path(self.export_mapper.django_output_file_mapping(infile), sep=os.sep)
+            outfile = standard_path(self.export_mapper.django_output_file_mapping(infile), sep=os.sep)
             process_option = self.export_mapper.bss_to_django_process_option(infile)
             converter = FileConverter(infile, process_option, outfile)       
             converters.append(converter)
@@ -207,7 +209,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          
    def django_project_root_line_changed(self, text):
       if self.export_mapper.django_project_root != text and os.path.exists(text) and os.path.isdir(text):
-         folder = self.standard_path(text, os.sep)
+         folder = standard_path(text, os.sep)
          self.export_mapper.set_django_root(folder)
       else:
          self.log_status_message("The specified Django project root is either not a directory or it doesn't exist", 10000, 'color:red')
