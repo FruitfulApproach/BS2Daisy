@@ -1,3 +1,8 @@
+# TODO
+
+Pencil icon changes to a green check mark once export for that file is correct. Else an error symbol.
+
+
 # bootstrap-studio-to-django-template
 [![Build Status](https://travis-ci.org/AbcSxyZ/bootstrap-studio-to-django-template.svg?branch=master)](https://travis-ci.org/AbcSxyZ/bootstrap-studio-to-django-template)
 [![Coverage Status](https://coveralls.io/repos/github/AbcSxyZ/bootstrap-studio-to-django-template/badge.svg?branch=coverall)](https://coveralls.io/github/AbcSxyZ/bootstrap-studio-to-django-template?branch=coverall)

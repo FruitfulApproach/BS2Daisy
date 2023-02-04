@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="images">
+    <file>img/icons/add-file24x24.png</file>
+    <file>img/icons/pencil-24x24.png</file>
+    <file>img/django.svg</file>
+    <file>img/bss-export-settings-screen.png</file>
+  </qresource>
+</RCC>

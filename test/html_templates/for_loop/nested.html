@@ -1,3 +1,13 @@
-<div dj-for="line in file">
-    <h1 dj-for="char in line"></h1>
+{% load static %}
+{% load static %}
+{% load static %}
+{% load static %}
+{% for line in file %}
+<div>
+ {% for char in line %}
+ <h1>
+ </h1>
+ {% endfor %}
 </div>
+{% endfor %}
+

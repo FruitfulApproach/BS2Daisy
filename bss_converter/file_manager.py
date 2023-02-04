@@ -66,7 +66,8 @@ class FileManager:
             if "settings.py" in directory_files:
                 setting_folder = directory
                 break
-        project_dirs.remove(setting_folder)
+        if setting_folder:
+            project_dirs.remove(setting_folder)
 
         #Remove folder path of django project to keep only app names
         return list(map(os.path.basename, project_dirs))
@@ -124,7 +125,10 @@ class FileManager:
             django_app_folder = os.path.join(django_app_folder, \
                 app_dest_template.substitute(app_name=app_name))
 
-            Path(django_app_folder).mkdir(parents=True)
+            try:
+                Path(django_app_folder).mkdir(parents=True)
+            except:
+                pass
             copy_tree(bss_app_folder, django_app_folder)
 
     def _copy_to_django(self):

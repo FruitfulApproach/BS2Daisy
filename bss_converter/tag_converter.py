@@ -19,7 +19,7 @@ class TagConverter:
     #Define different type of tag behavior
     ENCLOSED_TAG = ["for", "if", "block"]
     OPEN_TAG = ["load"]
-    TAG_LINK = ["script", "img", "link"]
+    TAG_LINK = ["script", "img", "link", "iframe"]
 
     def __init__(self, htmlfile):
         self.htmlfile = htmlfile
@@ -34,6 +34,8 @@ class TagConverter:
             self._extend_tag(tag, before=True)
 
         for tag in self.TAG_LINK:
+            #if tag == "iframe":
+                #print("DEBUG")
             self._replace_static_links(tag)
 
         self._replace_ref()
@@ -50,7 +52,7 @@ class TagConverter:
             error_exit(err_msg.format(self.htmlfile))
 
         with open(self.htmlfile) as htmlstream:
-            return BeautifulSoup(htmlstream, "html.parser")
+            return BeautifulSoup(htmlstream.read().encode(), "html.parser")
 
     def _save_tree(self):
         """
@@ -130,18 +132,26 @@ class TagConverter:
                 value = element_attributes.get(attribute)
                 if value:
                     return attribute, value
+            
+            return None, None
 
         static_template = '{{% static "{}" %}}'
+        url_template = '{{% url "{}" %}}'
 
         for element in self.tree.select(tag_name):
             attribute, link = find_ressource_attribute(element.attrs)
-
-            if link.startswith("http"):
-                continue
-
-            converted_link = self._convert_bss_link(link)
-            element.attrs[attribute] = \
-                    static_template.format(converted_link)
+            
+            if link:
+                if link.startswith("http"):
+                    continue
+                elif 'dj-to-url' in element.attrs:
+                    converted_link = str(link)
+                    element.attrs[attribute] = \
+                        url_template.format(converted_link)            
+                else:
+                    converted_link = self._convert_bss_link(link)
+                    element.attrs[attribute] = \
+                            static_template.format(converted_link)
 
     def _replace_ref(self):
         """
@@ -165,6 +175,7 @@ class TagConverter:
             a static link if needed.
             """
             url = match.group(1)
+            url = url.strip('"')
             if not url.startswith("http"):
                 url = self._convert_bss_link(url)
                 url = f'{{% static "{url}" %}}'

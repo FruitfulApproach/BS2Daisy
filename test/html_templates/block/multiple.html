@@ -1,7 +1,19 @@
-<title dj-block="title">Homepage</title>
-
-<div dj-block="site_body">
-Website Content
+{% load static %}
+{% load static %}
+{% load static %}
+{% load static %}
+{% block title %}
+<title>
+ Homepage
+</title>
+{% endblock %}
+{% block site_body %}
+<div>
+ Website Content
 </div>
+{% endblock %}
+{% block footer_section %}
+<footer>
+</footer>
+{% endblock %}
 
-<footer dj-block="footer_section"></footer>

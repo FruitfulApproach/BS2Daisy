@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ExportMapperWidget</class>
+ <widget class="QWidget" name="ExportMapperWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>837</width>
+    <height>409</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="2">
+    <widget class="QPushButton" name="checkForBSSChangesButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Check for BSS Changes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="promptForNewFileCheck">
+     <property name="toolTip">
+      <string>If unchecked, you can see this dialog again by clicking its app icon in windows.</string>
+     </property>
+     <property name="text">
+      <string>Prompt for Each New File</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="4">
+    <widget class="QTreeWidget" name="exportMappingTree">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>false</bool>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>24</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <attribute name="headerHighlightSections">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Input File</string>
+      </property>
+      <property name="toolTip">
+       <string>Relative to your BSS export's root folder.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Process Option</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Output File</string>
+      </property>
+      <property name="toolTip">
+       <string>Relative to your Django project's root.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>File Changes</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="openBSSFolderButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>BSS Folder in Explorer...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="expandWholeTreeButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Expand Whole Tree</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
