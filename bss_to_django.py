@@ -8,7 +8,7 @@ import ctypes
 myappid = 'SoundUnited.ETMADB.version-3' # arbitrary string
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-#os.environ['DEBUG'] = 'True'    # RELEASE: comment out
+os.environ['DEBUG'] = 'True'    # RELEASE: comment out
 
 if __name__ == '__main__':
    app = QApplication([])

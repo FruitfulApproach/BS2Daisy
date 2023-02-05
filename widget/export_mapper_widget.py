@@ -246,7 +246,6 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             self.remove_file_or_folder(prior_django_file)
             
          output_line.current_text = text
-         output_line.setText(text)
          
    def set_django_root(self, root:str):
       if root != self._djangoRoot:

@@ -14,6 +14,7 @@ class TagConverter:
    def __init__(self, filename:str):
       self._filename = filename
       self._bs = None
+      self._loadStatic = False
       
    def convert(self, thread:core.exporter_thread.ExporterThread):
       with open(self._filename) as htmlstream:
@@ -32,6 +33,8 @@ class TagConverter:
 
       content = self.replace_background_img(self.beautiful_soup.prettify())
       
+      if self._loadStatic:
+         content = f"{{% load static %}}\n\n{content}"
          
       self._bs = None
             
@@ -122,6 +125,7 @@ class TagConverter:
                element.attrs[attribute] = \
                           url_template.format(converted_link)            
             else:
+               self._loadStatic = True
                converted_link = self.convert_bss_link(link)
                element.attrs[attribute] = \
                           static_template.format(converted_link)
@@ -147,6 +151,7 @@ class TagConverter:
          Use current filename and convert it to
          a static link if needed.
          """
+         self._loadStatic = True
          url = match.group(1)
          url = url.strip('"')
          if not url.startswith("http"):
