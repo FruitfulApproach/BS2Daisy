@@ -11,7 +11,7 @@ class TagConverter:
    #Define different type of tag behavior
    ENCLOSED_TAG = ["for", "if", "block"]
    OPEN_TAG = ["load"]
-   TAG_LINK = ["script", "img", "link", "iframe"]
+   TAG_LINK = ["a", "script", "img", "link", "iframe"]
    
    def __init__(self, filename:str, export_mapper:ExportMapperWidget, thread:core.exporter_thread.ExporterThread):
       self._filename = filename
@@ -41,7 +41,7 @@ class TagConverter:
          self.extend_tag(tag, before=True)
    
       for tag in self.TAG_LINK:
-         self.replace_static_links(tag)      
+         self.replace_links(tag)      
 
       content = self.replace_background_img(self.beautiful_soup.prettify())
       
@@ -87,14 +87,14 @@ class TagConverter:
       django_link = self.export_mapper.django_template_url(file_link)
       return django_link
    
-   def replace_static_links(self, tag_name):
+   def replace_links(self, tag_name):
       """
       Replace tag who will use django static files.
 
       e.g. img, script etc.
       """
       link_allowed_attributes = ["href", "src"]
-
+      
       def find_ressource_attribute(element_attributes):
          """
          Find which attribute is used to point to a ressource.
@@ -117,11 +117,18 @@ class TagConverter:
             if link.startswith("http"):
                continue
             elif self.is_local_link(link):
-               element.attrs[attribute] = url_template.format(link)            
+               if link != '/':
+                  converted_link = self.convert_bss_link(link)
+                  element.attrs[attribute] = url_template.format(converted_link)            
+               else:
+                  element.attrs[attribute] = link
             else:
                self._loadStatic = True
-               converted_link = self.convert_bss_link(link)
-               element.attrs[attribute] = static_template.format(converted_link)
+               if link != '/':
+                  converted_link = self.convert_bss_link(link)
+                  element.attrs[attribute] = static_template.format(converted_link)
+               else:
+                  element.attrs[attribute] = link               
                
    def replace_ref(self):
       """
@@ -155,4 +162,6 @@ class TagConverter:
       return re.sub("url\((.*?)\)", url_convert, raw_file)
    
    def is_local_link(self, link:str):
+      if link == '/':
+         return True
       return link.endswith('.html') and self.export_mapper.bss_input_file_exists(rel_filename=link)

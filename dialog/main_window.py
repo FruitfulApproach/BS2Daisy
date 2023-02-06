@@ -35,11 +35,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
    
    def finish_setup(self):      
       self.tabs.insertTab(1, self._exportMapper, "Export Mapping")
-      self._exportMapper.file_added.connect(self.prompt_user_about_new_file)
+      self.export_mapper.file_added.connect(self.prompt_user_about_new_file)
+      self.export_mapper.status_message_signal.connect(lambda msg: self.log_status_message(msg, 5000))
 
       if self.export_mapper.bss_design_root is None:
          if len(sys.argv) < 2:
-            self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 50000)
+            self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 5000)
             self.tabs.setCurrentWidget(self.gettingStartedTab)
          else:
             if not os.path.exists(sys.argv[1]):
@@ -50,7 +51,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                self.export_mapper.set_bss_root(bss_root)
                self.log_status_message(f'This app called with argument {os.path.relpath(bss_root)}.', 5000, 'color:blue')
                self.tabs.setCurrentWidget(self._exportMapper)
-               #self._exportMapper.load_any_new_bss_files()
             else:
                self.log_status_message(f"{sys.argv[1]} is not a directory.", 10000, 'color:red')      
             

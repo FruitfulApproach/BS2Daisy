@@ -60,6 +60,11 @@
      </column>
      <column>
       <property name="text">
+       <string>File Changes</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Process Option</string>
       </property>
      </column>
@@ -73,15 +78,18 @@
      </column>
      <column>
       <property name="text">
-       <string>File Changes</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
        <string>Django URL</string>
       </property>
       <property name="toolTip">
        <string>The URL to access this resource in a Django template.</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Django View</string>
+      </property>
+      <property name="toolTip">
+       <string>Name of the Django view function that loads this resource.</string>
       </property>
      </column>
     </widget>
