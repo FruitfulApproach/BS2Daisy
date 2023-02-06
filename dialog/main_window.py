@@ -6,7 +6,6 @@ import sys
 from PyQt5.QtCore import Qt
 from datetime import datetime
 from widget.export_mapper_widget import ExportMapperWidget
-from widget.code_injector_widget import CodeInjectorWidget
 from core.exporter_thread import ExporterThread
 from core.file_converter import FileConverter
 from datetime import datetime
@@ -22,27 +21,22 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       
       if not pickled:
          self._exportMapper = ExportMapperWidget()
-         self._codeInjector = CodeInjectorWidget(file_mapper=self._exportMapper)
          self.finish_setup()
          
    def __setstate__(self, data):
       self.__init__(pickled=True)
       self._exportMapper = data['export mapper']
-      self._codeInjector = data['code injector']
       self.finish_setup()
       
    def __getstate__(self):
       return {
          'export mapper' : self._exportMapper,
-         'code injector' : self._codeInjector,
       }
    
    def finish_setup(self):      
       self.tabs.insertTab(1, self._exportMapper, "Export Mapping")
       self._exportMapper.file_added.connect(self.prompt_user_about_new_file)
-      
-      self.tabs.insertTab(2, self._codeInjector, "Code Injection")
-      
+
       if self.export_mapper.bss_design_root is None:
          if len(sys.argv) < 2:
             self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 50000)
@@ -150,6 +144,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          try:            
             with open(config_file, 'rb') as config_file:
                main_window = pickle.load(config_file)
+               QApplication.instance().main_window = main_window
+               main_window.export_mapper.load_any_new_bss_files()
                main_window.start_export_thread()
                
          except Exception as e:
@@ -196,7 +192,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          try:               
             outfile = standard_path(self.export_mapper.django_output_file_mapping(infile), sep=os.sep)
             process_option = self.export_mapper.bss_to_django_process_option(infile)
-            converter = FileConverter(infile, process_option, outfile)       
+            converter = FileConverter(infile, process_option, outfile, self.export_mapper)       
             converters.append(converter)
          except TypeError as e:
             self.log_status_message('Django project root is not set! Read the instructions.', 10000, 'color:red')

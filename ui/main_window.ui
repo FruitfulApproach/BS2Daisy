@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>901</width>
-    <height>737</height>
+    <width>452</width>
+    <height>214</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,20 +59,13 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>869</width>
-             <height>627</height>
+             <width>732</width>
+             <height>608</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
             <item row="1" column="0" colspan="2">
              <widget class="QLabel" name="label_3">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
               <property name="text">
                <string>2. Copy the following EXE filename (namely this app itself) to the BSS &gt; Export Settings &gt; Export Script field 
  (see green rectangle below).</string>
@@ -101,13 +94,6 @@
             </item>
             <item row="5" column="0" colspan="2">
              <widget class="QLabel" name="label_4">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
               <property name="text">
                <string>4. In BSS click Save to exit the settings screen, save your design and click the Export button.</string>
               </property>
@@ -128,13 +114,6 @@
             </item>
             <item row="3" column="0">
              <widget class="QLabel" name="label_5">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
               <property name="text">
                <string>3. Provide the root directory of your Django project:</string>
               </property>
@@ -142,13 +121,6 @@
             </item>
             <item row="0" column="0" colspan="2">
              <widget class="QLabel" name="label_2">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
               <property name="text">
                <string>1. Decide where you'd like BSS to copy intermediate project files and specify this in BSS &gt; Export Settings 
  (see blue rectangle below).</string>

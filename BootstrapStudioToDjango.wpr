@@ -11,7 +11,10 @@ proj.directory-list = [{'dirloc': loc('.'),
                         'recursive': True,
                         'watch_for_changes': True}]
 proj.file-type = 'shared'
-proj.launch-config = {loc('converter.py'): ('project',
+proj.launch-config = {loc('bss_to_django.py'): ('project',
+        ('../DiagramChaseDatabase/BSSExport',
+         '')),
+                      loc('converter.py'): ('project',
         ('../DiagramChaseDatabase/BSSExport',
          '')),
                       loc('dev_bss_to_django.py'): ('project',

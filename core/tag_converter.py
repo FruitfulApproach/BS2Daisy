@@ -4,6 +4,8 @@ import sys
 import re
 import os
 import core.exporter_thread
+from widget.export_mapper_widget import ExportMapperWidget
+from core.tools import standard_path
 
 class TagConverter:
    #Define different type of tag behavior
@@ -11,12 +13,22 @@ class TagConverter:
    OPEN_TAG = ["load"]
    TAG_LINK = ["script", "img", "link", "iframe"]
    
-   def __init__(self, filename:str):
+   def __init__(self, filename:str, export_mapper:ExportMapperWidget, thread:core.exporter_thread.ExporterThread):
       self._filename = filename
       self._bs = None
       self._loadStatic = False
+      self._thread = thread
+      self._exportMapper = export_mapper
       
-   def convert(self, thread:core.exporter_thread.ExporterThread):
+   @property
+   def thread(self):
+      return self._thread
+   
+   @property
+   def export_mapper(self):
+      return self._exportMapper
+      
+   def convert(self):
       with open(self._filename) as htmlstream:
          self._bs = BeautifulSoup(htmlstream.read().encode(), 'html.parser')
          
@@ -40,16 +52,11 @@ class TagConverter:
             
       return content
       
-   def convert_bss_attribute(self, attribute):
-      return f"dj-{attribute}"
-   
    def remove_for_data(self):
       """
       Remove extra tag used to simulate for loop content.
       """
-      bss_attribute = self.convert_bss_attribute("for-data")
-
-      for element in self.beautiful_soup.select(f'[{bss_attribute}]'):
+      for element in self.beautiful_soup.select(f'[dj-for-data]'):
          element.extract()   
          
    @property
@@ -61,7 +68,7 @@ class TagConverter:
       Replace html attribute from bss to django template tag.
       Used for tag with opening and closing part : if, for, block, etc.
       """
-      bss_attribute = self.convert_bss_attribute(django_tag)
+      bss_attribute = f'dj-{django_tag}'
       close_tag = f"{{% end{django_tag} %}}"
       
       for element in self.beautiful_soup.select(f'[{bss_attribute}]'):
@@ -77,19 +84,15 @@ class TagConverter:
             element.insert_after(close_tag)      
    
    def convert_bss_link(self, file_link):
-      # TODO!!!!!!!!
-      #Remove file root
-      if file_link.startswith("/"):
+      bss_root = self.export_mapper.bss_design_root
+      if file_link.startswith('/') or file_link.startswith('\\'):
          file_link = file_link[1:]
-
-      path = PurePath(file_link)
-
-      app_name = path.parts[2]
-      file_type = path.parts[1]
-
-      #Create link by switching app_name and file_type
-      new_path = PurePath(app_name) / file_type / "/".join(path.parts[3:])
-      return str(new_path)   
+      bss_path = os.path.join(bss_root, file_link)
+      bss_path = standard_path(bss_path, sep=os.sep)
+      django_link = self.export_mapper.django_output_file_mapping(bss_path)
+      django_link = self.export_mapper.filename_rel_root(django_link, root=self.export_mapper.django_project_root)
+      django_link = standard_path(django_link)
+      return django_link
    
    def replace_static_links(self, tag_name):
       """
@@ -120,21 +123,18 @@ class TagConverter:
          if link:
             if link.startswith("http"):
                continue
-            elif 'dj-to-url' in element.attrs:
-               converted_link = str(link)
-               element.attrs[attribute] = \
-                          url_template.format(converted_link)            
+            elif self.is_local_link(link):
+               element.attrs[attribute] = url_template.format(link)            
             else:
                self._loadStatic = True
                converted_link = self.convert_bss_link(link)
-               element.attrs[attribute] = \
-                          static_template.format(converted_link)
+               element.attrs[attribute] = static_template.format(converted_link)
                
    def replace_ref(self):
       """
       Insert variable reference in specified tags.
       """
-      bss_attribute = self.convert_bss_attribute("ref")
+      bss_attribute = 'dj-ref'
       for element in self.beautiful_soup.select(f'[{bss_attribute}]'):
          attribute_value = element.attrs.pop(bss_attribute)
          variable = f"{{{{{attribute_value}}}}}"
@@ -161,3 +161,5 @@ class TagConverter:
 
       return re.sub("url\((.*?)\)", url_convert, raw_file)
    
+   def is_local_link(self, link:str):
+      return link.endswith('.html') and self.export_mapper.bss_input_file_exists(rel_filename=link)

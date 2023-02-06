@@ -10,7 +10,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    bss_assets_subfolders = {'bootstrap', 'js', 'css', 'img'}
    default_ignore_bss_files = {'error.log', '.bss-to-django-config.pkl'}
    process_options = ['Ignore', 'BSS to Django', 'Copy Over']
-   image_file_extensions = {'.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'}
+   image_file_extensions = {'.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif', '.svg'}
    
    file_moved_or_deleted = pyqtSignal(str)
    file_added = pyqtSignal(str)
@@ -138,7 +138,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             self._ignoreBSSFiles.remove(filename)
             
    def default_file_output_path(self, bss_filename:str):      
-      rel_bss_filename = self.bss_filename_rel_root(bss_filename)
+      rel_bss_filename = self.filename_rel_root(bss_filename)
       parts = os.path.normpath(rel_bss_filename)
       parts = parts.split(os.sep)
       parts = filter(lambda x: bool(x), parts)
@@ -188,7 +188,10 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             elif os.path.isfile(rel_path):
                return os.path.join('templates', *parts[0:])
                
-   def bss_filename_rel_root(self, bss_filename:str) -> str:
+   def filename_rel_root(self, bss_filename:str, root:str=None) -> str:
+      if root is None:
+         root = self._bssDesignExport
+         
       drive, rest = os.path.splitdrive(bss_filename)
       parts = os.path.normpath(rest)
       parts = parts.split(os.sep)
@@ -196,7 +199,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       for i in range(1, len(parts)):
          test_directory = f'{drive}{os.sep}{os.path.join(*parts[0:i])}'
          
-         if os.path.samefile(test_directory, self._bssDesignExport):
+         if os.path.samefile(test_directory, root):
             return os.path.join(*parts[i:])   
          
    def set_bss_root(self, root:str):
@@ -211,14 +214,9 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def django_project_root(self):
       return self._djangoRoot
    
-   def django_output_file_mapping(self, bss_file:str):
-      
-         
+   def django_output_file_mapping(self, bss_file:str):        
       item = self._bssFileToTreeItem[bss_file]
       line_edit = self.exportMappingTree.itemWidget(item, self.OutputFile)
-      if os.path.basename(bss_file) == 'untitled.html':
-         print("DEBUG")
-         print(line_edit.text())
       return os.path.join(self.django_project_root, line_edit.text())
    
    def check_for_bss_file_structure_changes(self):
@@ -377,3 +375,8 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          changes_label.setPixmap(QPixmap(':/images/img/icons/error-24x24.ico'))
          
       self.exportMappingTree.setItemWidget(item, self.FileChanges, changes_label)
+
+   def bss_input_file_exists(self, rel_filename:str):
+      filename = os.path.join(self.bss_design_root, rel_filename)
+      filename = standard_path(filename, os.sep)
+      return filename in self._bssDesignExport
