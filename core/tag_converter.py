@@ -84,14 +84,7 @@ class TagConverter:
             element.insert_after(close_tag)      
    
    def convert_bss_link(self, file_link):
-      bss_root = self.export_mapper.bss_design_root
-      if file_link.startswith('/') or file_link.startswith('\\'):
-         file_link = file_link[1:]
-      bss_path = os.path.join(bss_root, file_link)
-      bss_path = standard_path(bss_path, sep=os.sep)
-      django_link = self.export_mapper.django_output_file_mapping(bss_path)
-      django_link = self.export_mapper.filename_rel_root(django_link, root=self.export_mapper.django_project_root)
-      django_link = standard_path(django_link)
+      django_link = self.export_mapper.django_template_url(file_link)
       return django_link
    
    def replace_static_links(self, tag_name):

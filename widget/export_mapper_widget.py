@@ -15,7 +15,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    file_moved_or_deleted = pyqtSignal(str)
    file_added = pyqtSignal(str)
    
-   InputFile, ProcessOption, OutputFile, FileChanges = range(4)
+   InputFile, ProcessOption, OutputFile, FileChanges, DjangoURL = range(5)
    
    def __init__(self, pickled=False):
       super().__init__()
@@ -64,6 +64,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       output_line.setText(self.default_file_output_path(filename))
       output_line.current_text = output_line.text()
       output_line.textEdited.connect(lambda text: self.django_output_line_edited(filename, text))
+   
+      django_url_line = QLineEdit()
+      django_url_line.setText(self.default_django_url(filename))
+      django_url_line.current_text = django_url_line.text()
+      django_url_line.textEdited.connect(lambda text: self.django_url_line_edited(filename, text))
       
       if filename in self._ignoreBSSFiles:
          process_combo.setCurrentText('Ignore')    
@@ -100,6 +105,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self.exportMappingTree.setItemWidget(item, self.ProcessOption, process_combo)   
       self.exportMappingTree.setItemWidget(item, self.OutputFile, output_line)
       self.exportMappingTree.setItemWidget(item, self.FileChanges, change_label)
+      self.exportMappingTree.setItemWidget(item, self.DjangoURL, django_url_line)
       
       #self.file_added.emit(filename)
       
@@ -159,7 +165,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                            rel_path = os.path.join(bss_root, *parts[:3])
                            if os.path.isdir(rel_path):
                               app_name = parts[2]
-                              return os.path.join(app_name, 'static', subfolder, *parts[3:])
+                              return os.path.join(app_name, 'static', app_name, subfolder, *parts[3:])
                            elif os.path.isfile(rel_path):
                               return os.path.join('static', subfolder, *parts[2:])
                         else:
@@ -187,6 +193,59 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                
             elif os.path.isfile(rel_path):
                return os.path.join('templates', *parts[0:])
+      return "/"
+            
+   def default_django_url(self, bss_filename:str):       
+      rel_bss_filename = self.filename_rel_root(bss_filename)
+      parts = os.path.normpath(rel_bss_filename)
+      parts = parts.split(os.sep)
+      parts = filter(lambda x: bool(x), parts)
+      parts = list(parts)
+      bss_root = self._bssDesignExport
+      
+      if parts:
+         if parts[0] == 'assets':
+            if len(parts) > 1:
+               rel_path = os.path.join(bss_root, *parts[:2])
+               
+               if os.path.isdir(rel_path):
+                  subfolder = parts[1]
+                  
+                  if subfolder in self.bss_assets_subfolders:
+                     if subfolder != 'bootstrap':                        
+                        if len(parts) > 2:
+                           rel_path = os.path.join(bss_root, *parts[:3])
+                           if os.path.isdir(rel_path):
+                              app_name = parts[2]
+                              return standard_path(self.remove_dot_html(os.path.join(app_name, subfolder, *parts[3:])))
+                           elif os.path.isfile(rel_path):
+                              return standard_path(self.remove_dot_html(os.path.join(subfolder, *parts[2:])))
+                        else:
+                           return standard_path(subfolder)
+                     else:
+                        return standard_path(self.remove_dot_html(os.path.join(subfolder, *parts[2:])))
+                           
+                  else:
+                     return standard_path(self.remove_dot_html(os.path.join(subfolder, *parts[2:])))
+                  
+               else:
+                  return standard_path(self.remove_dot_html(os.path.join(*parts[1:])))
+            else:
+               return standard_path('/')
+         else:
+            rel_path = os.path.join(bss_root, parts[0])
+            
+            if os.path.isdir(rel_path):
+               folder_name = parts[0]
+               
+               if len(parts) > 1:
+                  return standard_path(self.remove_dot_html(os.path.join(folder_name, *parts[1:])))
+               else:
+                  return standard_path(folder_name)
+               
+            elif os.path.isfile(rel_path):
+               return standard_path(self.remove_dot_html(os.path.join(*parts[0:])))
+      return standard_path("/")
                
    def filename_rel_root(self, bss_filename:str, root:str=None) -> str:
       if root is None:
@@ -224,6 +283,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          if not os.path.exists(filename):  # It's been deleted or moved
             item:QTreeWidgetItem = self._bssFileToTreeItem[filename]
             django_file = self.exportMappingTree.itemWidget(item, self.OutputFile)
+            django_file = django_file.text()
             self.remove_file_or_folder(django_file)
             del self._bssFileToTreeItem[filename]
             item.parent().removeChild(item)
@@ -244,6 +304,13 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             self.remove_file_or_folder(prior_django_file)
             
          output_line.current_text = text
+         
+   def django_url_line_edited(self, filename, text):
+      item = self._bssFileToTreeItem[filename]
+      django_url_line:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+      
+      if text != django_url_line.current_text:
+         django_url_line.current_text = text
          
    def set_django_root(self, root:str):
       if root != self._djangoRoot:
@@ -294,7 +361,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          toplevel.append(self.exportMappingTree.topLevelItem(i))            
       for item in toplevel:
          c = self._addBranchToDict(item, d)
-         self._treeToDict(item, c[2])      
+         self._treeToDict(item, c[3])      
       return d
    
    def _addBranchToDict(self, item:QTreeWidgetItem, d:dict):
@@ -303,14 +370,16 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       process_opt = process_opt.currentText()
       outfile:QLineEdit = self.exportMappingTree.itemWidget(item, self.OutputFile)
       outfile = outfile.text()
-      c = d[infile] = (process_opt, outfile, {})        
+      django_url:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+      django_url = django_url.text()
+      c = d[infile] = (process_opt, outfile, django_url, {})        
       return c
    
    def _treeToDict(self, item0:QTreeWidgetItem, d:dict):
       for k in range(item0.childCount()):
          item = item0.child(k)
          c = self._addBranchToDict(item, d)
-         self._treeToDict(item, c[2])        
+         self._treeToDict(item, c[3])        
    
    def tree_from_dict(self, d:dict, parent:QTreeWidgetItem=None):      
       bss_root = self._bssDesignExport         
@@ -318,7 +387,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          item_path = os.path.join(bss_root, infile)
          
          if os.path.exists(item_path):
-            item, process_combo, output_line = self._treeItemFromDict(item_path, t)         
+            item, process_combo, output_line, django_url_line = self._treeItemFromDict(item_path, t)         
             
             if parent is None:
                self.exportMappingTree.addTopLevelItem(item)         
@@ -333,22 +402,28 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                change_label.setPixmap(QPixmap(':/images/img/icons/pencil-24x24.png'))               
                self.exportMappingTree.setItemWidget(item, self.FileChanges, change_label)
                
-            self.tree_from_dict(t[2], parent=item)
+            self.exportMappingTree.setItemWidget(item, self.DjangoURL, django_url_line)
+               
+            self.tree_from_dict(t[3], parent=item)
 
    def _treeItemFromDict(self, path:str, t:tuple):
-      process_opt, outfile, c = t
+      process_opt, outfile, django_url, c = t
       process_combo = QComboBox()
       process_combo.addItems(self.process_options)
       process_combo.setCurrentText(process_opt)
       output_line = QLineEdit()    
       infile = os.path.basename(path)
-      output_line.setText(self.default_file_output_path(path))
+      output_line.setText(outfile)
       output_line.current_text = output_line.text()
-      output_line.textEdited.connect(lambda text: self.django_output_line_edited(path, text))      
+      output_line.textEdited.connect(lambda text: self.django_output_line_edited(path, text))   
+      django_url_line = QLineEdit()
+      django_url_line.setText(django_url)
+      django_url_line.current_text = django_url_line.text()
+      django_url_line.textEdited.connect(lambda text: self.django_url_line_edited(path, text))
       item = QTreeWidgetItem([infile, None, None, None])      
       process_combo.currentTextChanged.connect(lambda text: self.bss_item_process_changed(item, path, process=text))
       self._bssFileToTreeItem[path] = item
-      return item, process_combo, output_line
+      return item, process_combo, output_line, django_url_line
       
    @staticmethod
    def modification_date(filename):
@@ -380,3 +455,20 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       filename = os.path.join(self.bss_design_root, rel_filename)
       filename = standard_path(filename, os.sep)
       return filename in self._bssDesignExport
+   
+   def django_template_url(self, bss_filename:str):
+      bss_root = self.bss_design_root
+      if bss_filename.startswith('/') or bss_filename.startswith('\\'):
+         bss_filename = bss_filename[1:]
+      bss_path = os.path.join(bss_root, bss_filename)
+      bss_path = standard_path(bss_path, sep=os.sep)
+      item = self._bssFileToTreeItem[bss_path]
+      widget:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+      django_url = widget.text()
+      django_url = standard_path(django_url) 
+      return django_url
+   
+   def remove_dot_html(self, filename:str):
+      if filename.endswith('.html'):
+         filename = filename[:-len('.html')]
+      return filename

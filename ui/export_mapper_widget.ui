@@ -76,6 +76,14 @@
        <string>File Changes</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Django URL</string>
+      </property>
+      <property name="toolTip">
+       <string>The URL to access this resource in a Django template.</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item row="2" column="4">
@@ -126,7 +134,7 @@
       <string>Export Only on Design Changes</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>

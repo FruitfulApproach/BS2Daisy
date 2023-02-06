@@ -137,6 +137,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
    def try_loading_config_from_arg():
       bss_root = sys.argv[1]
       main_window = None
+      app = QApplication.instance()
       
       if os.path.exists(bss_root):
          config_file = standard_path(os.path.join(bss_root, '.bss-to-django-config.pkl'))
@@ -144,16 +145,21 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          try:            
             with open(config_file, 'rb') as config_file:
                main_window = pickle.load(config_file)
-               QApplication.instance().main_window = main_window
+               app.main_window = main_window
                main_window.export_mapper.load_any_new_bss_files()
                main_window.start_export_thread()
                
          except Exception as e:
-               main_window = MainWindow()
-               main_window.show()            
-               main_window.log_status_message(str(e), 10000, 'color:red')            
+            main_window = MainWindow()
+            app.main_window = main_window
+            main_window.show()            
+            main_window.log_status_message(str(e), 10000, 'color:red')    
+            
+            #if 'DEBUG' in os.environ:
+               #raise e
       else:
          main_window = MainWindow()
+         app.main_window = main_window
          main_window.show()
    
       if not main_window.isVisible() and 'DEBUG' in os.environ:

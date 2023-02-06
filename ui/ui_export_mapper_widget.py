@@ -42,7 +42,7 @@ class Ui_ExportMapperWidget(object):
         self.expandWholeTreeButton.setObjectName("expandWholeTreeButton")
         self.gridLayout.addWidget(self.expandWholeTreeButton, 2, 2, 1, 1)
         self.onlyOnChangesCheck = QtWidgets.QCheckBox(ExportMapperWidget)
-        self.onlyOnChangesCheck.setChecked(True)
+        self.onlyOnChangesCheck.setChecked(False)
         self.onlyOnChangesCheck.setObjectName("onlyOnChangesCheck")
         self.gridLayout.addWidget(self.onlyOnChangesCheck, 2, 1, 1, 1)
 
@@ -61,6 +61,8 @@ class Ui_ExportMapperWidget(object):
         self.exportMappingTree.headerItem().setText(2, _translate("ExportMapperWidget", "Output File"))
         self.exportMappingTree.headerItem().setToolTip(2, _translate("ExportMapperWidget", "Relative to your Django project\'s root."))
         self.exportMappingTree.headerItem().setText(3, _translate("ExportMapperWidget", "File Changes"))
+        self.exportMappingTree.headerItem().setText(4, _translate("ExportMapperWidget", "Django URL"))
+        self.exportMappingTree.headerItem().setToolTip(4, _translate("ExportMapperWidget", "The URL to access this resource in a Django template."))
         self.openBSSFolderButton.setText(_translate("ExportMapperWidget", "BSS Folder in Explorer..."))
         self.checkForBSSChangesButton.setText(_translate("ExportMapperWidget", "Check for BSS Changes"))
         self.expandWholeTreeButton.setText(_translate("ExportMapperWidget", "Expand Whole Tree"))
