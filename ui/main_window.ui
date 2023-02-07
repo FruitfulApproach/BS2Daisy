@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>274</height>
+    <width>942</width>
+    <height>641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="gettingStartedTab">
        <attribute name="title">
@@ -59,19 +59,11 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>732</width>
-             <height>608</height>
+             <width>893</width>
+             <height>688</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
-            <item row="1" column="0" colspan="2">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>2. Copy the following EXE filename (namely this app itself) to the BSS &gt; Export Settings &gt; Export Script field 
- (see green rectangle below).</string>
-              </property>
-             </widget>
-            </item>
             <item row="2" column="1">
              <widget class="QPushButton" name="copyExeFilenameButton">
               <property name="toolTip">
@@ -92,10 +84,13 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0" colspan="2">
-             <widget class="QLabel" name="label_4">
+            <item row="6" column="0">
+             <widget class="QLabel" name="label">
               <property name="text">
-               <string>4. In BSS click Save to exit the settings screen, save your design and click the Export button.</string>
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="../resources.qrc">:/images/img/bss-export-settings-screen.png</pixmap>
               </property>
              </widget>
             </item>
@@ -109,6 +104,31 @@
               </property>
               <property name="placeholderText">
                <string>Enter in or browse for your Django project's root directory (usually where manage.py sits)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QPushButton" name="djangoProjectBrowseButton">
+              <property name="toolTip">
+               <string>Copy this EXE's filename to your clipboard.</string>
+              </property>
+              <property name="text">
+               <string>Browse...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>2. Copy the following EXE filename (namely this app itself) to the BSS &gt; Export Settings &gt; Export Script field 
+ (see green rectangle below).</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>4. In BSS click Save to exit the settings screen, save your design and click the Export button.</string>
               </property>
              </widget>
             </item>
@@ -127,23 +147,37 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label">
+            <item row="8" column="0">
+             <widget class="QLineEdit" name="bssBoilerplateLine">
               <property name="text">
-               <string/>
+               <string>./BSSBoilerplate</string>
               </property>
-              <property name="pixmap">
-               <pixmap resource="../resources.qrc">:/images/img/bss-export-settings-screen.png</pixmap>
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="readOnly">
+               <bool>false</bool>
+              </property>
+              <property name="placeholderText">
+               <string>E.g. ../BSSBoilerplate (the parent directory) or ./BSSBoilerplate (the same directory as your Django root)</string>
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="QPushButton" name="djangoProjectBrowseButton">
+            <item row="8" column="1">
+             <widget class="QPushButton" name="bssBoilerplateBrowseButton">
               <property name="toolTip">
                <string>Copy this EXE's filename to your clipboard.</string>
               </property>
               <property name="text">
                <string>Browse...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0" colspan="2">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>5. Optionally, where would you like to store default-generated boilerplate code, relative to your Django root?
+ The Django developer will be able to customize these boilerplates.</string>
               </property>
              </widget>
             </item>
@@ -202,6 +236,74 @@
           <property name="text">
            <string>Open the Issues Forum 🔗</string>
           </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="settingsPage">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QToolBox" name="toolBox">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="jumpToCodePage">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>912</width>
+             <height>465</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Jump to Code Settings</string>
+           </attribute>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0" colspan="2">
+             <widget class="QLineEdit" name="jumpToCodeCommandLine">
+              <property name="text">
+               <string>notepad.exe {file_name}</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QComboBox" name="jumpToCodeCombo">
+              <item>
+               <property name="text">
+                <string>Notepad</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Wingware</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>VS Code</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>965</width>
+             <height>621</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Page 2</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>

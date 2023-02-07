@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QMainWindow
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QTreeWidget
 from ui.ui_export_mapper_widget import Ui_ExportMapperWidget
 import os
 from PyQt5.QtCore import pyqtSignal
@@ -58,7 +58,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def finish_setup(self):
       self.openBSSFolderButton.clicked.connect(lambda: os.startfile(self.bss_design_root))
       self.checkForBSSChangesButton.clicked.connect(self.check_for_bss_file_structure_changes)
-      self.expandWholeTreeButton.clicked.connect(self.exportMappingTree.expandAll)
+      self.expandWholeTreeButton.clicked.connect(self.expand_whole_tree)
+      
+   def expand_whole_tree(self):
+      self.tree.expandAll()
+      self.resize_tree_columns_to_fit_contents()
    
    def create_new_bss_tree_item(self, filename:str) -> QTreeWidgetItem:
       process_combo = QComboBox()
@@ -109,18 +113,18 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          parent:QTreeWidgetItem = self._bssFileToTreeItem[directory]
          parent.addChild(item)
       elif directory == self._bssDesignExport:
-         self.exportMappingTree.addTopLevelItem(item)   
+         self.tree.addTopLevelItem(item)   
          
       change_label = QLabel()
       change_label.setPixmap(QPixmap(':/images/img/icons/add-file24x24.png'))
          
-      self.exportMappingTree.setItemWidget(item, self.ProcessOption, process_combo)   
-      self.exportMappingTree.setItemWidget(item, self.OutputFile, output_line)
-      self.exportMappingTree.setItemWidget(item, self.FileChanges, change_label)
-      self.exportMappingTree.setItemWidget(item, self.DjangoURL, django_url_line)
+      self.tree.setItemWidget(item, self.ProcessOption, process_combo)   
+      self.tree.setItemWidget(item, self.OutputFile, output_line)
+      self.tree.setItemWidget(item, self.FileChanges, change_label)
+      self.tree.setItemWidget(item, self.DjangoURL, django_url_line)
       
       if django_view_line:
-         self.exportMappingTree.setItemWidget(item, self.DjangoView, django_view_line)
+         self.tree.setItemWidget(item, self.DjangoView, django_view_line)
       
       #self.file_added.emit(filename)      
       # HACKFIX: file_added signal isn't working and QCoreApplication.processEvents() does nothing to fix that.
@@ -148,6 +152,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                file = standard_path(os.path.join(root, file), os.sep)
                if file not in self._bssFileToTreeItem:
                   self.create_new_bss_tree_item(file)
+         self.resize_tree_columns_to_fit_contents()
                
    def bss_item_process_changed(self, item, filename, process:str):
       if process == 'Ignore':
@@ -296,14 +301,14 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def django_output_file_mapping(self, bss_file:str):        
       item = self._bssFileToTreeItem[bss_file]
-      line_edit = self.exportMappingTree.itemWidget(item, self.OutputFile)
+      line_edit = self.tree.itemWidget(item, self.OutputFile)
       return os.path.join(self.django_project_root, line_edit.text())
    
    def check_for_bss_file_structure_changes(self):
       for filename in dict(self._bssFileToTreeItem):
          if not os.path.exists(filename):  # It's been deleted or moved
             item:QTreeWidgetItem = self._bssFileToTreeItem[filename]
-            django_file = self.exportMappingTree.itemWidget(item, self.OutputFile)
+            django_file = self.tree.itemWidget(item, self.OutputFile)
             django_file = django_file.text()
             self.remove_file_or_folder(django_file)
             del self._bssFileToTreeItem[filename]
@@ -316,7 +321,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def django_output_line_edited(self, filename, text):
       item = self._bssFileToTreeItem[filename]
       
-      output_line:QLineEdit = self.exportMappingTree.itemWidget(item, self.OutputFile)
+      output_line:QLineEdit = self.tree.itemWidget(item, self.OutputFile)
       
       if text != output_line.current_text:
          prior_django_file = os.path.join(self.django_project_root, output_line.current_text)
@@ -328,7 +333,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          
    def django_url_line_edited(self, filename, text):
       item = self._bssFileToTreeItem[filename]
-      django_url_line:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+      django_url_line:QLineEdit = self.tree.itemWidget(item, self.DjangoURL)
       
       if text != django_url_line.current_text:
          django_url_line.current_text = text
@@ -368,7 +373,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def bss_to_django_process_option(self, filename:str) -> str:
       item = self._bssFileToTreeItem[filename]
-      item:QComboBox = self.exportMappingTree.itemWidget(item, self.ProcessOption)
+      item:QComboBox = self.tree.itemWidget(item, self.ProcessOption)
       return item.currentText()
    
    def bss_to_django_tree_item(self, filename:str):
@@ -378,8 +383,8 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def tree_to_dict(self) -> dict:
       d = {}      
       toplevel = []   
-      for i in range(self.exportMappingTree.topLevelItemCount()):
-         toplevel.append(self.exportMappingTree.topLevelItem(i))            
+      for i in range(self.tree.topLevelItemCount()):
+         toplevel.append(self.tree.topLevelItem(i))            
       for item in toplevel:
          c = self._addBranchToDict(item, d)
          self._treeToDict(item, c[self.TreeIndex])      
@@ -387,13 +392,13 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def _addBranchToDict(self, item:QTreeWidgetItem, d:dict):
       infile = item.text(self.InputFile)
-      process_opt:QComboBox = self.exportMappingTree.itemWidget(item, self.ProcessOption)
+      process_opt:QComboBox = self.tree.itemWidget(item, self.ProcessOption)
       process_opt = process_opt.currentText()
-      outfile:QLineEdit = self.exportMappingTree.itemWidget(item, self.OutputFile)
+      outfile:QLineEdit = self.tree.itemWidget(item, self.OutputFile)
       outfile = outfile.text()
-      django_url:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+      django_url:QLineEdit = self.tree.itemWidget(item, self.DjangoURL)
       django_url = django_url.text()
-      django_view:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoView)
+      django_view:QLineEdit = self.tree.itemWidget(item, self.DjangoView)
       if django_view:
          django_view = django_view.text()
       c = d[infile] = (process_opt, outfile, django_url, django_view, {})        
@@ -414,23 +419,24 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             item, process_combo, output_line, django_url_line, django_view_line = self._treeItemFromDict(item_path, t)         
             
             if parent is None:
-               self.exportMappingTree.addTopLevelItem(item)         
+               self.tree.addTopLevelItem(item)         
             else:
                parent.addChild(item)           
                
-            self.exportMappingTree.setItemWidget(item, self.ProcessOption, process_combo)
-            self.exportMappingTree.setItemWidget(item, self.OutputFile, output_line)    
-            self.exportMappingTree.setItemWidget(item, self.DjangoURL, django_url_line)
+            self.tree.setItemWidget(item, self.ProcessOption, process_combo)
+            self.tree.setItemWidget(item, self.OutputFile, output_line)    
+            self.tree.setItemWidget(item, self.DjangoURL, django_url_line)
             
             if django_view_line:
-               self.exportMappingTree.setItemWidget(item, self.DjangoView, django_view_line)         
+               self.tree.setItemWidget(item, self.DjangoView, django_view_line)         
             
             if self._lastExportTime is None or self.modification_date(item_path) > self._lastExportTime:
                change_label = QLabel()
                change_label.setPixmap(QPixmap(':/images/img/icons/pencil-24x24.png'))               
-               self.exportMappingTree.setItemWidget(item, self.FileChanges, change_label)
+               self.tree.setItemWidget(item, self.FileChanges, change_label)
                
             self.tree_from_dict(t[self.TreeIndex], parent=item)
+      self.resize_tree_columns_to_fit_contents()
 
    def _treeItemFromDict(self, path:str, t:tuple):
       process_opt, outfile, django_url, django_view, c = t
@@ -472,7 +478,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       
    def handle_file_exported_result(self, filename:str, result:str):
       item = self._bssFileToTreeItem[filename]
-      changes_label:QLabel = self.exportMappingTree.itemWidget(item, self.FileChanges)
+      changes_label:QLabel = self.tree.itemWidget(item, self.FileChanges)
       
       if changes_label is None:
          changes_label = QLabel()         
@@ -482,7 +488,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       elif result == "error":
          changes_label.setPixmap(QPixmap(':/images/img/icons/error-24x24.ico'))
          
-      self.exportMappingTree.setItemWidget(item, self.FileChanges, changes_label)
+      self.tree.setItemWidget(item, self.FileChanges, changes_label)
 
    def bss_input_file_exists(self, rel_filename:str):
       if rel_filename.startswith('/'):
@@ -501,7 +507,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       bss_path = standard_path(bss_path, sep=os.sep)
       if bss_path in self._bssFileToTreeItem:
          item = self._bssFileToTreeItem[bss_path]
-         widget:QLineEdit = self.exportMappingTree.itemWidget(item, self.DjangoURL)
+         widget:QLineEdit = self.tree.itemWidget(item, self.DjangoURL)
          django_url = widget.text()
          django_url = standard_path(self.remove_dot_html(django_url))
          return django_url
@@ -516,3 +522,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def is_html_file(self, filename:str):
       return filename.endswith('.html')
+   
+   @property
+   def tree(self) -> QTreeWidget:
+      return self.exportMappingTree
+   
+   def resize_tree_columns_to_fit_contents(self):
+      for i in range(self.tree.columnCount()):
+         self.tree.resizeColumnToContents(i)

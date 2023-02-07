@@ -10,8 +10,15 @@ from core.exporter_thread import ExporterThread
 from core.file_converter import FileConverter
 from datetime import datetime
 from core.tools import standard_path
+from code_generators.view_generator import ViewGenerator
 
 class MainWindow(Ui_MainWindow, QMainWindow):   
+   default_jump_to_code_commands = {
+      "Notepad" : lambda: filename, line_number: f'notepad.exe {filename}',
+      "Wingware" : lambda filename, line_number: f'wing.exe {filename}:{line_number}',
+      "VS Code": lambda filename, line_number: "(TODO)",
+   }
+
    def __init__(self, pickled=False):
       super().__init__()
       super().__init__()
@@ -212,7 +219,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          self.show()
          self.tabs.setCurrentWidget(self.export_mapper)
          item = self.export_mapper.bss_to_django_tree_item(filename)
-         self.export_mapper.exportMappingTree.expand(self.export_mapper.exportMappingTree.indexFromItem(item))
+         self.export_mapper.tree.expand(self.export_mapper.tree.indexFromItem(item))
          self.export_mapper.setFocus()
          
    def django_project_root_line_changed(self, text):
