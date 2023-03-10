@@ -3,6 +3,8 @@ import os
 import shutil
 from core.tag_converter import TagConverter
 from widget.export_mapper_widget import ExportMapperWidget
+from widget.code_generation_widget import CodeGenerationWidget
+from widget.boilerplate_setting_widget import BoilerplateSettingWidget
 
 class FileConverter:
    def __init__(self, in_file:str, process_opt:str, out_file:str, export_mapper:ExportMapperWidget):
@@ -44,6 +46,13 @@ class FileConverter:
          
          with open(self.output_file, 'w') as output_file:
             output_file.write(tag_converter.convert())
+            
+         code_gen:CodeGenerationWidget = self.export_mapper.code_generation_mapping(bss_file=self.input_file)
          
+         if code_gen:
+            for boilerplate in code_gen.boilerplate_widgets:
+               boilerplate:BoilerplateSettingWidget
+               generator = boilerplate.code_generator
+               
          
       

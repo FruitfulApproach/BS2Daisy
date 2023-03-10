@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>942</width>
-    <height>641</height>
+    <width>782</width>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="gettingStartedTab">
        <attribute name="title">
@@ -59,21 +59,11 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>893</width>
-             <height>688</height>
+             <width>733</width>
+             <height>608</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
-            <item row="2" column="1">
-             <widget class="QPushButton" name="copyExeFilenameButton">
-              <property name="toolTip">
-               <string>Copy this EXE's filename to your clipboard.</string>
-              </property>
-              <property name="text">
-               <string>📋</string>
-              </property>
-             </widget>
-            </item>
             <item row="2" column="0">
              <widget class="QLineEdit" name="exeFilenameLine">
               <property name="dragEnabled">
@@ -81,16 +71,6 @@
               </property>
               <property name="readOnly">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap resource="../resources.qrc">:/images/img/bss-export-settings-screen.png</pixmap>
               </property>
              </widget>
             </item>
@@ -107,13 +87,13 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="1">
-             <widget class="QPushButton" name="djangoProjectBrowseButton">
+            <item row="2" column="1">
+             <widget class="QPushButton" name="copyExeFilenameButton">
               <property name="toolTip">
                <string>Copy this EXE's filename to your clipboard.</string>
               </property>
               <property name="text">
-               <string>Browse...</string>
+               <string>📋</string>
               </property>
              </widget>
             </item>
@@ -125,13 +105,6 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0" colspan="2">
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>4. In BSS click Save to exit the settings screen, save your design and click the Export button.</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="0">
              <widget class="QLabel" name="label_5">
               <property name="text">
@@ -139,32 +112,18 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QLabel" name="label_2">
+            <item row="6" column="0">
+             <widget class="QLabel" name="label">
               <property name="text">
-               <string>1. Decide where you'd like BSS to copy intermediate project files and specify this in BSS &gt; Export Settings 
- (see blue rectangle below).</string>
+               <string/>
+              </property>
+              <property name="pixmap">
+               <pixmap resource="../resources.qrc">:/images/img/bss-export-settings-screen.png</pixmap>
               </property>
              </widget>
             </item>
-            <item row="8" column="0">
-             <widget class="QLineEdit" name="bssBoilerplateLine">
-              <property name="text">
-               <string>./BSSBoilerplate</string>
-              </property>
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-              <property name="placeholderText">
-               <string>E.g. ../BSSBoilerplate (the parent directory) or ./BSSBoilerplate (the same directory as your Django root)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="1">
-             <widget class="QPushButton" name="bssBoilerplateBrowseButton">
+            <item row="4" column="1">
+             <widget class="QPushButton" name="djangoProjectBrowseButton">
               <property name="toolTip">
                <string>Copy this EXE's filename to your clipboard.</string>
               </property>
@@ -173,11 +132,18 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="0" colspan="2">
-             <widget class="QLabel" name="label_6">
+            <item row="5" column="0" colspan="2">
+             <widget class="QLabel" name="label_4">
               <property name="text">
-               <string>5. Optionally, where would you like to store default-generated boilerplate code, relative to your Django root?
- The Django developer will be able to customize these boilerplates.</string>
+               <string>4. In BSS click Save to exit the settings screen, save your design and click the Export button.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="2">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>1. Decide where you'd like BSS to copy intermediate project files and specify this in BSS &gt; Export Settings 
+ (see blue rectangle below).</string>
               </property>
              </widget>
             </item>
@@ -255,53 +221,101 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>912</width>
-             <height>465</height>
+             <width>915</width>
+             <height>510</height>
             </rect>
            </property>
            <attribute name="label">
             <string>Jump to Code Settings</string>
            </attribute>
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0" colspan="2">
-             <widget class="QLineEdit" name="jumpToCodeCommandLine">
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="groupBox_4">
+              <property name="title">
+               <string>Python Files</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_14">
+               <item row="0" column="0">
+                <widget class="QLineEdit" name="jumpToPythonCommandLine">
+                 <property name="text">
+                  <string>wing.exe --reuse &quot;{file_path}&quot;:{line_number}</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
-               <string>notepad.exe {file_name}</string>
+               <string>I highly recommend that you download and install the Wingware Python IDE, the Pro version, but they do have some free versions. 
+ Has out-of-the-box support for Django project creation, editing and debugging.   You would then need to add the directory containing 
+ wing.exe to your Path environment variable.   Right-click Wing's taskbar icon &gt; Properties &gt; Open File Location in order to 
+ find this directory.   The same procedure applies to any other IDE you prefer.</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QComboBox" name="jumpToCodeCombo">
-              <item>
-               <property name="text">
-                <string>Notepad</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Wingware</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>VS Code</string>
-               </property>
-              </item>
+            <item row="3" column="0">
+             <widget class="QCommandLinkButton" name="downloadWingwareButton">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Wingware Downloads</string>
+              </property>
              </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QGroupBox" name="groupBox_5">
+              <property name="title">
+               <string>All Other File Types</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_15">
+               <item row="0" column="0">
+                <widget class="QLineEdit" name="jumpToOtherCommandLine">
+                 <property name="text">
+                  <string>Code.exe --goto &quot;{file_path}:{line_number}&quot;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_2">
+          <widget class="QWidget" name="todoPage">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>965</width>
-             <height>621</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
-            <string>Page 2</string>
+            <string>ToDo</string>
            </attribute>
           </widget>
          </widget>

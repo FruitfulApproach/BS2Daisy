@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>758</width>
-    <height>119</height>
+    <width>754</width>
+    <height>487</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3">
+   <item row="3" column="1">
     <widget class="QPushButton" name="checkForBSSChangesButton">
      <property name="maximumSize">
       <size>
@@ -40,33 +40,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QCheckBox" name="onlyOnChangesCheck">
-     <property name="toolTip">
-      <string>If unchecked, you can see this dialog again by clicking its app icon in windows.</string>
-     </property>
-     <property name="text">
-      <string>Export Only on Design Changes</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QPushButton" name="openBSSFolderButton">
-     <property name="maximumSize">
-      <size>
-       <width>200</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>BSS Folder in Explorer...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
+   <item row="3" column="0">
     <widget class="QPushButton" name="expandWholeTreeButton">
      <property name="maximumSize">
       <size>
@@ -79,7 +53,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="5">
+   <item row="0" column="0" colspan="10">
     <widget class="QTreeWidget" name="exportMappingTree">
      <property name="toolTip">
       <string/>
@@ -99,7 +73,13 @@
      <property name="wordWrap">
       <bool>true</bool>
      </property>
+     <attribute name="headerCascadingSectionResizes">
+      <bool>true</bool>
+     </attribute>
      <attribute name="headerHighlightSections">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="headerStretchLastSection">
       <bool>false</bool>
      </attribute>
      <column>
@@ -152,6 +132,105 @@
        <string>Boilerplate code generation options.  Click buttons to go to the code.</string>
       </property>
      </column>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="openBSSFolderButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>BSS Folder in Explorer...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="9">
+    <widget class="QPushButton" name="boilerplateModelsButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Open boilerplate models.py file in order to customize the defaults.</string>
+     </property>
+     <property name="text">
+      <string>Boilerplate Models</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="2">
+    <widget class="QCheckBox" name="onlyOnChangesCheck">
+     <property name="toolTip">
+      <string>If unchecked, you can see this dialog again by clicking its app icon in windows.</string>
+     </property>
+     <property name="text">
+      <string>Export Only on Design Changes</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="9">
+    <widget class="QPushButton" name="boilerplateURLsButton">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Open boilerplate urls.py file in order to customize the defaults.</string>
+     </property>
+     <property name="text">
+      <string>Boilerplate URLs</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="8">
+    <widget class="QPushButton" name="boilerplateViewsButton">
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Open boilerplate views.py file in order to customize the defaults.</string>
+     </property>
+     <property name="text">
+      <string>Boilerplate Views</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="8">
+    <widget class="QPushButton" name="boilerplateFormsButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Open boilerplate models.py file in order to customize the defaults.</string>
+     </property>
+     <property name="text">
+      <string>Boilerplate Forms</string>
+     </property>
     </widget>
    </item>
   </layout>

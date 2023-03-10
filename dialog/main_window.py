@@ -1,24 +1,18 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QTreeWidgetItem, QComboBox, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from ui.ui_main_window import Ui_MainWindow
 import _pickle as pickle
 import os
 import sys
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QDesktopServices
 from datetime import datetime
 from widget.export_mapper_widget import ExportMapperWidget
 from core.exporter_thread import ExporterThread
 from core.file_converter import FileConverter
 from datetime import datetime
 from core.tools import standard_path
-from code_generators.view_generator import ViewGenerator
 
 class MainWindow(Ui_MainWindow, QMainWindow):   
-   default_jump_to_code_commands = {
-      "Notepad" : lambda: filename, line_number: f'notepad.exe {filename}',
-      "Wingware" : lambda filename, line_number: f'wing.exe {filename}:{line_number}',
-      "VS Code": lambda filename, line_number: "(TODO)",
-   }
-
    def __init__(self, pickled=False):
       super().__init__()
       super().__init__()
@@ -33,17 +27,22 @@ class MainWindow(Ui_MainWindow, QMainWindow):
    def __setstate__(self, data):
       self.__init__(pickled=True)
       self._exportMapper = data['export mapper']
+      self.jumpToPythonCommandLine.setText(data['jump to python cmd'])
+      self.jumpToOtherCommandLine.setText(data['jump to other cmd'])
       self.finish_setup()
       
    def __getstate__(self):
       return {
          'export mapper' : self._exportMapper,
+         'jump to python cmd' : self.jumpToPythonCommandLine.text(),
+         'jump to other cmd' : self.jumpToOtherCommandLine.text(),
       }
    
    def finish_setup(self):      
       self.tabs.insertTab(1, self._exportMapper, "Export Mapping")
       self.export_mapper.file_added.connect(self.prompt_user_about_new_file)
       self.export_mapper.status_message_signal.connect(lambda msg: self.log_status_message(msg, 5000))
+      self.export_mapper.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line)
 
       if self.export_mapper.bss_design_root is None:
          if len(sys.argv) < 2:
@@ -77,6 +76,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       self.djangoProjectBrowseButton.clicked.connect(self.browse_for_django_project_clicked)
       self.djangoProjectRootLine.textChanged.connect(self.django_project_root_line_changed)
       self.runExporterButton.clicked.connect(self.start_export_thread)
+      self.clearLogButton.clicked.connect(self.statusLogText.clear)
+      self.copyLogToClipboardButton.clicked.connect(self.copy_status_log_to_clipboard)
+      self.openIssuesForumButton.clicked.connect(self.open_the_issues_forum_in_browser)
             
    def log_status_message(self, msg:str, sleep_ms:int, extra_css:str=None):
       self.statusBar().showMessage(msg, sleep_ms)      
@@ -149,12 +151,17 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       if os.path.exists(bss_root):
          config_file = standard_path(os.path.join(bss_root, '.bss-to-django-config.pkl'))
          
-         try:            
-            with open(config_file, 'rb') as config_file:
-               main_window = pickle.load(config_file)
+         try:
+            if os.path.exists(config_file):
+               with open(config_file, 'rb') as config_file:
+                  main_window = pickle.load(config_file)
+                  app.main_window = main_window
+                  main_window.export_mapper.load_any_new_bss_files()
+                  main_window.start_export_thread()
+            else:
+               main_window = MainWindow()
                app.main_window = main_window
-               main_window.export_mapper.load_any_new_bss_files()
-               main_window.start_export_thread()
+               main_window.show()
                
          except Exception as e:
             main_window = MainWindow()
@@ -162,8 +169,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             main_window.show()            
             main_window.log_status_message(str(e), 10000, 'color:red')    
             
-            #if 'DEBUG' in os.environ:
-               #raise e
+            if 'DEBUG' in os.environ:
+               raise e
       else:
          main_window = MainWindow()
          app.main_window = main_window
@@ -228,3 +235,20 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          self.export_mapper.set_django_root(folder)
       else:
          self.log_status_message("The specified Django project root is either not a directory or it doesn't exist", 10000, 'color:red')
+         
+   def jump_to_code_file_line(self, filename:str, line_number:int):
+      if filename.endswith('.py'):
+         command = self.jumpToPythonCommandLine.text()
+      else:
+         command = self.jumpToOtherCommandLine.text()
+         
+      command = command.format(file_path=filename, line_number=line_number)
+      os.system(command)
+      
+   def copy_status_log_to_clipboard(self):
+      QApplication.clipboard().setText(self.statusLogText.toPlainText()) 
+      self.statusBar().showMessage('Status log copied to clipboard!', 5000)
+      
+   def open_the_issues_forum_in_browser(self):
+      url = QUrl('https://github.com/enjoysmath/BootstrapStudioToDjango/issues')
+      QDesktopServices.openUrl(url)

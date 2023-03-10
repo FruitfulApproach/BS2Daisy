@@ -6,20 +6,27 @@ from PyQt5.QtGui import QPixmap
 from datetime import datetime
 from core.tools import standard_path
 import stringcase
+from widget.code_generation_widget import CodeGenerationWidget
+from code_gen.view_generator import ViewGenerator
 
 class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
+   bss_to_django_folder = 'BSSToDjango'
+   boilerplates_folder = 'DjangoBoilerplates'
+   
    bss_assets_subfolders = {'bootstrap', 'js', 'css', 'img'}
    default_ignore_bss_files = {'error.log', '.bss-to-django-config.pkl'}
    process_options = ['Ignore', 'BSS to Django', 'Copy Over']
    image_file_extensions = {'.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif', '.svg'}
+   
    # TODO: font formats: ttf, woff, woff2, eot => Copy Over
    
    file_moved_or_deleted = pyqtSignal(str)
    file_added = pyqtSignal(str)
    status_message_signal = pyqtSignal(str)
+   jump_to_code_file_line_requested = pyqtSignal(str, int)
    
-   InputFile, FileChanges, ProcessOption, OutputFile, DjangoURL, DjangoView = range(6)
-   TreeIndex = 4
+   InputFile, FileChanges, ProcessOption, OutputFile, DjangoURL, DjangoView, CodeGeneration = range(7)
+   TreeIndex = 5
    
    def __init__(self, pickled=False):
       super().__init__()
@@ -59,6 +66,8 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self.openBSSFolderButton.clicked.connect(lambda: os.startfile(self.bss_design_root))
       self.checkForBSSChangesButton.clicked.connect(self.check_for_bss_file_structure_changes)
       self.expandWholeTreeButton.clicked.connect(self.expand_whole_tree)
+      self.boilerplateViewsButton.clicked.connect(lambda: self.jump_to_boilerplates('views.py'))
+      self.boilerplateURLsButton.clicked.connect(lambda: self.jump_to_boilerplates('urls.py'))
       
    def expand_whole_tree(self):
       self.tree.expandAll()
@@ -83,8 +92,10 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          django_view_line.setText(self.default_django_view(filename))
          django_view_line.current_text = django_view_line.text()
          django_view_line.textEdited.connect(lambda text: self.django_view_line_edited(filename, text))
+         code_generation = self.create_code_generation_widget(filename)
       else:
          django_view_line = None
+         code_generation = None
       
       if filename in self._ignoreBSSFiles:
          process_combo.setCurrentText('Ignore')    
@@ -125,6 +136,9 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       
       if django_view_line:
          self.tree.setItemWidget(item, self.DjangoView, django_view_line)
+      
+      if code_generation:
+         self.tree.setItemWidget(item, self.CodeGeneration, code_generation)
       
       #self.file_added.emit(filename)      
       # HACKFIX: file_added signal isn't working and QCoreApplication.processEvents() does nothing to fix that.
@@ -273,11 +287,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       identifier = "/".join(parts)
       return identifier
                
-   def filename_rel_root(self, bss_filename:str, root:str=None) -> str:
+   def filename_rel_root(self, filename:str, root:str=None) -> str:
       if root is None:
          root = self._bssDesignExport
          
-      drive, rest = os.path.splitdrive(bss_filename)
+      drive, rest = os.path.splitdrive(filename)
       parts = os.path.normpath(rest)
       parts = parts.split(os.sep)
          
@@ -303,6 +317,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       item = self._bssFileToTreeItem[bss_file]
       line_edit = self.tree.itemWidget(item, self.OutputFile)
       return os.path.join(self.django_project_root, line_edit.text())
+   
+   def code_generation_mapping(self, bss_file:str):
+      item = self._bssFileToTreeItem[bss_file]
+      code_gen_widget = self.tree.itemWidget(item, self.CodeGeneration)
+      return code_gen_widget
    
    def check_for_bss_file_structure_changes(self):
       for filename in dict(self._bssFileToTreeItem):
@@ -399,9 +418,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       django_url:QLineEdit = self.tree.itemWidget(item, self.DjangoURL)
       django_url = django_url.text()
       django_view:QLineEdit = self.tree.itemWidget(item, self.DjangoView)
+      code_gen:CodeGenerationWidget = self.tree.itemWidget(item, self.CodeGeneration)
+      
       if django_view:
          django_view = django_view.text()
-      c = d[infile] = (process_opt, outfile, django_url, django_view, {})        
+      c = d[infile] = (process_opt, outfile, django_url, django_view, code_gen, {})        
       return c
    
    def _treeToDict(self, item0:QTreeWidgetItem, d:dict):
@@ -416,7 +437,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          item_path = os.path.join(bss_root, infile)
          
          if os.path.exists(item_path):
-            item, process_combo, output_line, django_url_line, django_view_line = self._treeItemFromDict(item_path, t)         
+            item, process_combo, output_line, django_url_line, django_view_line, code_generation = self._treeItemFromDict(item_path, t)         
             
             if parent is None:
                self.tree.addTopLevelItem(item)         
@@ -428,7 +449,10 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             self.tree.setItemWidget(item, self.DjangoURL, django_url_line)
             
             if django_view_line:
-               self.tree.setItemWidget(item, self.DjangoView, django_view_line)         
+               self.tree.setItemWidget(item, self.DjangoView, django_view_line)    
+               
+            if code_generation:
+               self.tree.setItemWidget(item, self.CodeGeneration, code_generation)
             
             if self._lastExportTime is None or self.modification_date(item_path) > self._lastExportTime:
                change_label = QLabel()
@@ -439,7 +463,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self.resize_tree_columns_to_fit_contents()
 
    def _treeItemFromDict(self, path:str, t:tuple):
-      process_opt, outfile, django_url, django_view, c = t
+      process_opt, outfile, django_url, django_view, code_generation, c = t
       process_combo = QComboBox()
       process_combo.addItems(self.process_options)
       process_combo.setCurrentText(process_opt)
@@ -452,6 +476,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       django_url_line.setText(django_url)
       django_url_line.current_text = django_url_line.text()
       django_url_line.textEdited.connect(lambda text: self.django_url_line_edited(path, text))
+            
       if self.is_html_file(path):
          django_view_line = QLineEdit()
          django_view_line.setText(django_view)
@@ -459,10 +484,15 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          django_view_line.textEdited.connect(lambda text: self.django_view_line_edited(path, text))
       else:
          django_view_line = None
-      item = QTreeWidgetItem([infile, None, None, None, None])      
+         
+      if code_generation:
+         code_generation.populate_boilerplate_combo_boxes()
+         self.connect_code_generation_widget(code_generation)
+         
+      item = QTreeWidgetItem([infile, None, None, None, None, None])      
       process_combo.currentTextChanged.connect(lambda text: self.bss_item_process_changed(item, path, process=text))
       self._bssFileToTreeItem[path] = item
-      return item, process_combo, output_line, django_url_line, django_view_line
+      return item, process_combo, output_line, django_url_line, django_view_line, code_generation
       
    @staticmethod
    def modification_date(filename):
@@ -530,3 +560,24 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def resize_tree_columns_to_fit_contents(self):
       for i in range(self.tree.columnCount()):
          self.tree.resizeColumnToContents(i)
+         
+   def create_code_generation_widget(self, input_file:str):
+      code_gen_widget = CodeGenerationWidget(input_file, export_mapper=self)
+      code_gen_widget.populate_boilerplate_combo_boxes(init=True)
+      self.connect_code_generation_widget(code_gen_widget)
+      return code_gen_widget
+   
+   def connect_code_generation_widget(self, code_gen_widget:CodeGenerationWidget):
+      code_gen_widget.status_message_signal.connect(self.status_message_signal.emit)
+      code_gen_widget.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line_requested.emit)
+      
+   def jump_to_boilerplates(self, filename:str):
+      self.jump_to_code_file_line_requested.emit(os.path.join(self.django_boilerplates_folder, filename), 1)
+
+   @property
+   def absolute_bss_to_django_folder(self):
+      return os.path.join(self.django_project_root, self.bss_to_django_folder)
+   
+   @property
+   def django_boilerplates_folder(self):
+      return os.path.join(self.absolute_bss_to_django_folder, self.boilerplates_folder)
