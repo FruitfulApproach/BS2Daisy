@@ -318,6 +318,11 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       line_edit = self.tree.itemWidget(item, self.OutputFile)
       return os.path.join(self.django_project_root, line_edit.text())
    
+   def django_view_name_mapping(self, bss_file:str):
+      item = self._bssFileToTreeItem[bss_file]
+      line_edit = self.tree.itemWidget(item, self.DjangoView)
+      return line_edit.text()
+   
    def code_generation_mapping(self, bss_file:str):
       item = self._bssFileToTreeItem[bss_file]
       code_gen_widget = self.tree.itemWidget(item, self.CodeGeneration)
@@ -481,7 +486,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          django_view_line = QLineEdit()
          django_view_line.setText(django_view)
          django_view_line.current_text = django_view_line.text()
-         django_view_line.textEdited.connect(lambda text: self.django_view_line_edited(path, text))
+         #django_view_line.textEdited.connect(lambda text: self.django_view_line_edited(path, text))
       else:
          django_view_line = None
          
@@ -581,3 +586,6 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    @property
    def django_boilerplates_folder(self):
       return os.path.join(self.absolute_bss_to_django_folder, self.boilerplates_folder)
+   
+   def django_boilerplates_filename(self, basename:str) -> str:
+      return os.path.join(self.django_boilerplates_folder, basename)

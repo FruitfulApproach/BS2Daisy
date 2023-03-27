@@ -8,6 +8,7 @@ from code_gen.view_generator import ViewGenerator
 
 class BoilerplateSettingWidget(QWidget):
    status_message_signal = pyqtSignal(str)
+   jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    def __init__(self, input_file:str, code_gen_widget, generator:CodeGenerator, pickled=False):
       super().__init__()
@@ -15,7 +16,7 @@ class BoilerplateSettingWidget(QWidget):
       self._boilerplateCombo = QComboBox()
       self._jumpToCodeButton = QToolButton()
       self._jumpToCodeButton.setIcon(QIcon(':/images/img/icons/pencil-24x24.png'))
-      self._jumpToCodeButton.clicked.connect(lambda: generator.jump_to_code(self.input_file, self._boilerplateCombo.currentText()))
+      self._jumpToCodeButton.clicked.connect(lambda: self.code_generator.jump_to_code())
       self._jumpToCodeButton.setMinimumHeight(28)
       self._jumpToCodeButton.setMinimumWidth(28)
       self._jumpToCodeButton.setToolTip('Jump to the code generated from the selected boilerplate.')
@@ -30,7 +31,7 @@ class BoilerplateSettingWidget(QWidget):
       self._inputFile = input_file
       self._codeGenWidget = code_gen_widget
       self._codeGenerator = generator
-      
+            
       if not pickled:
          self.finish_setup()
          
@@ -49,8 +50,10 @@ class BoilerplateSettingWidget(QWidget):
    
    def finish_setup(self):
       #self._boilerplateCombo.addItems(self.code_generator.list_view_boilerplates())
-      pass
-   
+      self._boilerplateCombo.currentTextChanged.connect(lambda text: self._jumpToCodeButton.setEnabled(text != ' '))
+      self.code_generator.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line_requested.emit)
+      self.code_generator.set_boilerplate_widget(self)
+        
    def populate_combo_box(self, init:bool=False):
       self.set_boilerplates(self.code_generator.list_boilerplates())
       if init:
@@ -59,13 +62,13 @@ class BoilerplateSettingWidget(QWidget):
    def set_boilerplates(self, boilerplates:list):
       current = self._boilerplateCombo.currentText()
       self._boilerplateCombo.clear()
-      boilerplates = [' '] + sorted(boilerplates)
+      boilerplates = sorted(boilerplates) + [' ']
       self._boilerplateCombo.addItems(boilerplates)
       
       if current in boilerplates:
          self._boilerplateCombo.setCurrentText(current)
       else:
-         self._boilerplateCombo.setCurrentText(' ')
+         self._boilerplateCombo.setCurrentIndex(0)
          self.status_message_signal.emit(f'Boilerplate {current} must have got deleted.  Make sure to select a new boilerplate {self.code_generator.type_name} for {self.input_file} if you need one.')
          
    def boilerplates(self):
@@ -86,3 +89,8 @@ class BoilerplateSettingWidget(QWidget):
    @property
    def code_generator(self):
       return self._codeGenerator
+   
+   @property
+   def current_boilerplate(self):
+      return self._boilerplateCombo.currentText()
+

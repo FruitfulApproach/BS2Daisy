@@ -20,4 +20,4 @@ proj.launch-config = {loc('bss_to_django.py'): ('project',
                       loc('dev_bss_to_django.py'): ('project',
         ('BSSExport',
          ''))}
-proj.main-file = loc('twin_primes2.py')
+proj.main-file = loc('bss_to_django.py')

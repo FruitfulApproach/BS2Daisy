@@ -40,15 +40,6 @@ class ViewGenerator(CodeGenerator):
          # TODO
          self._templatePath = path
          
-   def output_view_code(self, function=None):
-      if function is None:
-         function = boilerplate_view_function
-      view_name = self.view_name
-      source = inspect.getsource(function)
-      source = source.format(template_path=f'"{self.template_path}"')
-      source = self.function_def_renamed(source, view_name)
-      super().output_view_code(function=source, name=view_name)
-      
    def list_boilerplates(self) -> list:
       _, module, attributes = self.get_boilerplate_attributes('views.py')
       boilerplates = []
@@ -77,7 +68,7 @@ class ViewGenerator(CodeGenerator):
             module_file.write(string)
             
    def delete_view_code_if_unmodified(self, function):
-      module_path, module, attribs = self.module_attributes(self.django_project_root, self.app_folder, 'views.py')
+      module_path, module, attribs = self.module_attributes(self.django_project_root, self.app_folder(), 'views.py')
       
       if callable(function):
          func_name = function.__name__
@@ -91,23 +82,65 @@ class ViewGenerator(CodeGenerator):
          existing_source = inspect.getsource(existing)
          
          if source == existing_source:
-            with open(module_path, 'rw') as module_file:
+            with open(module_path, 'r') as module_file:
                module_str = module_file.read()
-               module_str = module_str.replace(source, '')
+               
+            module_str = module_str.replace(source, '')
+            
+            with open(module_path, 'w') as module_file:   
                module_file.write(module_str)
          else:
             self.status_message_signal.emit(f"{func_name} code has been modified in {module_path}, so we won't delete it.")  
             
-   def output_view_code(self, function, name=None):
-      module_path, module, attribs = self.module_attributes(self.django_project_root, self.app_folder, 'views.py')
-
-      if (name and name not in attribs) or function.__name__ not in attribs:
-         if callable(function):
-            source = inspect.getsource(function)
-         else:
-            source = str(function)
+   def output_code(self, function=None, name=None):      
+      module_path, module, attribs = self.get_boilerplate_attributes('views.py')  
+      
+      if function is None:
+         function = getattr(module, self.boilderplate_widget.current_boilerplate)
          
+      if name is None:
+         name = self.export_mapper.django_view_name_mapping(self.input_file)
+              
+      if name:
+         module_path, dest_module, attribs = self.module_attributes(self.django_project_root, self.app_folder(), 'views.py')
+         
+         if hasattr(dest_module, name):
+            existing = getattr(dest_module, name)
+            self.delete_view_code_if_unmodified(existing)
+            
+         source = inspect.getsource(function)   
+         
+         if name != function.__name__:
+            source = self.function_def_renamed(source, name)
+            
          source = f'\n{source}'
          
          with open(module_path, 'a') as module_file:
-            module_file.write(source) 
+            module_file.write(source)
+            
+              
+   def filename_line_number_of_function(self, function_name:str, create:bool=True):
+      module_path, module, attribs = self.module_attributes(self.django_project_root, self.app_folder(), 'views.py')
+      
+      if hasattr(module, function_name):
+         source_lines = inspect.getsourcelines(getattr(module, function_name))
+         return module_path, source_lines[1]
+      else:
+         if not create:
+            with open(module_path, "r") as python_file:
+               num_lines = python_file.readlines()
+               num_lines = len(num_lines)
+               return module_path, num_lines
+         else:           
+            self.output_code(name=function_name)
+            return self.filename_line_number_of_function(function_name, create=False)
+         
+   def jump_to_code(self):
+      func_name = self.export_mapper.django_view_name_mapping(self.input_file)
+      if func_name:
+         filename, line_number = self.filename_line_number_of_function(func_name)      
+         self.jump_to_code_file_line_requested.emit(filename, line_number)
+      else:
+         self.status_message_signal.emit("Code not found. Try exporting first.")
+         
+         

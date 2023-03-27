@@ -9,11 +9,13 @@ import re
 
 class CodeGenerator(QObject):
    status_message_signal = pyqtSignal(str)
+   jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    def __init__(self, code_gen_widget, pickled=False):
       super().__init__()
       
       self._codeGenWidget = code_gen_widget
+      self._boilerPlateWidget = None
       
       if not pickled:         
          self._djangoTree = {}
@@ -105,7 +107,8 @@ class CodeGenerator(QObject):
          module = self.load_module_with_path(module_path)
          attribs = dir(module)
          return module_path, module, attribs
-      except:
+      except Exception as e:
+         self.status_message_signal.emit(str(e))
          return None, None, []
       
    func_def_name_regex = re.compile(r"(?P<prefix>.*def\s+)(?P<name>[a-zA-Z_][a-zA-Z_0-9]*)(?P<suffix>\s*\(.*\)\s*:.*)", flags=re.DOTALL)
@@ -148,16 +151,7 @@ class CodeGenerator(QObject):
                   if absolute == False:
                      return folder
                   return filename
-   
-   def jump_to_code_by_boilerplate(self, boiler_plate:str):
-      raise NotImplementedError
-  
-   def _jump_to_code_by_boilerplate(self, boiler_plate:str):
-      raise NotImplementedError
-   
-   def jump_to_code(self):
-      pass
-   
+    
    @property
    def type_name(self):
       return self.__class__.__name__[:-len('Generator')]
@@ -172,6 +166,22 @@ class CodeGenerator(QObject):
    def list_boilerplates(self):
       raise NotImplementedError
    
+   def line_number_of_function(self, function_name:str):
+      raise NotImplementedError
+   
+   def jump_to_code(self):
+      raise NotImplementedError
+   
+   def output_code(self, function=None, name=None):
+      raise NotImplementedError
+   
+   def set_boilerplate_widget(self, widget):
+      self._boilerPlateWidget = widget
+      
+   @property
+   def boilderplate_widget(self):
+      return self._boilerPlateWidget
+   
       
 if __name__ == '__main__':
    from PyQt5.QtWidgets import QApplication
@@ -182,7 +192,7 @@ if __name__ == '__main__':
    
    code_gen = CodeGenerator(django_root='../../DiagramChaseDatabase', app_folder='DiagramChaseDatabase', indent=8)
    module = code_gen.load_module_with_path(module_path='../../DiagramChaseDatabase/DiagramChaseDatabase/views.py')   
-   code_gen.output_view_code(test_view)
+   code_gen.output_code(test_view)
    code = inspect.getsource(test_view)
    code1 = code_gen.tabify_code(code)
    print(code1)

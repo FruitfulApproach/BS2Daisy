@@ -53,6 +53,7 @@ class FileConverter:
             for boilerplate in code_gen.boilerplate_widgets:
                boilerplate:BoilerplateSettingWidget
                generator = boilerplate.code_generator
+               generator.output_code()
                
          
       
