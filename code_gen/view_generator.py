@@ -1,6 +1,6 @@
 from code_gen.code_generator import CodeGenerator
 import inspect
-
+import os
 
 class ViewGenerator(CodeGenerator):   
    def __init__(self, code_gen_widget, pickled=False):
@@ -24,7 +24,11 @@ class ViewGenerator(CodeGenerator):
       
    @property
    def template_path(self):
-      return self._templatePath
+      full_path = self.export_mapper.django_output_file_mapping(self.input_file)
+      rel_path = self.export_mapper.filename_rel_root(filename=full_path, root=self.django_project_root)
+      if rel_path.startswith('templates\\'):
+         rel_path = rel_path[len('templates\\'):]
+      return rel_path      
    
    @property
    def view_name(self) -> str:
@@ -78,7 +82,7 @@ class ViewGenerator(CodeGenerator):
       if func_name in attribs:
          existing = getattr(module, func_name)
          
-         source = inspect.getsource(function)
+         source = self.get_boilerplate_source(function)
          existing_source = inspect.getsource(existing)
          
          if source == existing_source:
@@ -86,6 +90,8 @@ class ViewGenerator(CodeGenerator):
                module_str = module_file.read()
                
             module_str = module_str.replace(source, '')
+            #module_str = module_str.strip()
+            #module_str = f'{module_str}\n'
             
             with open(module_path, 'w') as module_file:   
                module_file.write(module_str)
@@ -108,7 +114,7 @@ class ViewGenerator(CodeGenerator):
             existing = getattr(dest_module, name)
             self.delete_view_code_if_unmodified(existing)
             
-         source = inspect.getsource(function)   
+         source = self.get_boilerplate_source(function)
          
          if name != function.__name__:
             source = self.function_def_renamed(source, name)
@@ -143,4 +149,8 @@ class ViewGenerator(CodeGenerator):
       else:
          self.status_message_signal.emit("Code not found. Try exporting first.")
          
+   def get_boilerplate_source(self, function):
+      source = inspect.getsource(function)
+      source = source.format(template_path=f'"{self.template_path}"')
+      return source
          
