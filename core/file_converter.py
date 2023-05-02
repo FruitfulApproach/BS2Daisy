@@ -32,28 +32,34 @@ class FileConverter:
    def convert(self, thread:core.exporter_thread.ExporterThread):
       if self._processOption == 'Ignore':
          pass
-      elif self._processOption == 'Copy Over':
-         if os.path.isdir(self._infile):
-            if not os.path.exists(self._outfile):
-               os.makedirs(self._outfile)
-         elif os.path.isfile(self._infile):
-            directory = os.path.dirname(self._outfile)
-            if not os.path.exists(directory):
-               os.makedirs(directory)
-            shutil.copyfile(self._infile, self._outfile)
-      elif self._processOption == 'BSS to Django':         
-         tag_converter = TagConverter(self.input_file, self.export_mapper, thread)
+      else:
+         outdir = os.path.dirname(self.output_file)
          
-         with open(self.output_file, 'w') as output_file:
-            output_file.write(tag_converter.convert())
+         if not os.path.exists(outdir):
+            os.makedirs(outdir)
+         
+         if self._processOption == 'Copy Over':
+            if os.path.isdir(self._infile):
+               if not os.path.exists(self.output_file):
+                  os.makedirs(self.output_file)
+            elif os.path.isfile(self._infile):
+               directory = os.path.dirname(self.output_file)
+               if not os.path.exists(directory):
+                  os.makedirs(directory)
+               shutil.copyfile(self._infile, self.output_file)
+         elif self._processOption == 'BSS to Django':         
+            tag_converter = TagConverter(self.input_file, self.export_mapper, thread)
             
-         code_gen:CodeGenerationWidget = self.export_mapper.code_generation_mapping(bss_file=self.input_file)
-         
-         if code_gen:
-            for boilerplate in code_gen.boilerplate_widgets:
-               boilerplate:BoilerplateSettingWidget
-               generator = boilerplate.code_generator
-               generator.output_code()
+            with open(self.output_file, 'w') as output_file:
+               output_file.write(tag_converter.convert())
                
-         
+            code_gen:CodeGenerationWidget = self.export_mapper.code_generation_mapping(bss_file=self.input_file)
+            
+            if code_gen:
+               for boilerplate in code_gen.boilerplate_widgets:
+                  boilerplate:BoilerplateSettingWidget
+                  generator = boilerplate.code_generator
+                  generator.output_code()
+                  
+            
       

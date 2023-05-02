@@ -220,7 +220,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                folder_name = parts[0]
                
                if len(parts) > 1:
-                  return os.path.join(folder_name, 'templates', *parts[1:])
+                  return os.path.join(folder_name, 'templates', *parts)
                else:
                   return os.path.join(folder_name, 'templates')
                
@@ -283,8 +283,9 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def default_django_view(self, bss_filename:str):
       identifier = self.default_django_url(bss_filename)
       parts = identifier.split(sep="/")
-      parts = [stringcase.camelcase(x) for x in parts]
-      identifier = "/".join(parts)
+      parts = [stringcase.snakecase(x) for x in parts]
+      #identifier = "/".join(parts)
+      identifier = parts[-1]
       return identifier
                
    def filename_rel_root(self, filename:str, root:str=None) -> str:
@@ -315,8 +316,9 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def django_output_file_mapping(self, bss_file:str):        
       item = self._bssFileToTreeItem[bss_file]
-      line_edit = self.tree.itemWidget(item, self.OutputFile)
-      return os.path.join(self.django_project_root, line_edit.text())
+      outfile = self.tree.itemWidget(item, self.OutputFile)
+      outfile = outfile.text()
+      return os.path.join(self.django_project_root, outfile)
    
    def django_view_name_mapping(self, bss_file:str):
       item = self._bssFileToTreeItem[bss_file]
@@ -436,10 +438,14 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          c = self._addBranchToDict(item, d)
          self._treeToDict(item, c[self.TreeIndex])        
    
-   def tree_from_dict(self, d:dict, parent:QTreeWidgetItem=None):      
-      bss_root = self._bssDesignExport         
+   def tree_from_dict(self, d:dict, parent:QTreeWidgetItem=None, path=None):      
+      bss_root = self._bssDesignExport  
+   
+      if path is None:
+         path = bss_root
+         
       for infile, t in d.items():
-         item_path = os.path.join(bss_root, infile)
+         item_path = os.path.join(path, infile)
          
          if os.path.exists(item_path):
             item, process_combo, output_line, django_url_line, django_view_line, code_generation = self._treeItemFromDict(item_path, t)         
@@ -464,7 +470,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                change_label.setPixmap(QPixmap(':/images/img/icons/pencil-24x24.png'))               
                self.tree.setItemWidget(item, self.FileChanges, change_label)
                
-            self.tree_from_dict(t[self.TreeIndex], parent=item)
+            self.tree_from_dict(t[self.TreeIndex], parent=item, path=item_path)
       self.resize_tree_columns_to_fit_contents()
 
    def _treeItemFromDict(self, path:str, t:tuple):

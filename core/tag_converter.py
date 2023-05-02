@@ -6,6 +6,7 @@ import os
 import core.exporter_thread
 from widget.export_mapper_widget import ExportMapperWidget
 from core.tools import standard_path
+import html
 
 class TagConverter:
    #Define different type of tag behavior
@@ -44,6 +45,7 @@ class TagConverter:
          self.replace_links(tag)      
 
       content = self.replace_background_img(self.beautiful_soup.prettify())
+      content = html.unescape(content)
       
       if self._loadStatic:
          content = f"{{% load static %}}\n\n{content}"
@@ -84,7 +86,7 @@ class TagConverter:
             element.insert_after(close_tag)      
    
    def convert_bss_link(self, file_link):
-      django_link = self.export_mapper.django_template_url(file_link)
+      django_link = self.export_mapper.django_template_url(file_link)      
       return django_link
    
    def replace_links(self, tag_name):
@@ -114,7 +116,7 @@ class TagConverter:
          attribute, link = find_ressource_attribute(element.attrs)
    
          if link:
-            if link.startswith("http"):
+            if link.startswith("http") or link.startswith("{%") or link.startswith("{{"):
                continue
             elif self.is_local_link(link):
                if link != '/':

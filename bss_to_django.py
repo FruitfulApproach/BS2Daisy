@@ -5,7 +5,7 @@ import os
 
 # Bugfix: the taskbar icon issue:
 import ctypes
-myappid = 'SoundUnited.ETMADB.version-3' # arbitrary string
+myappid = 'BootstrapStudioToDjango' # arbitrary string
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 os.environ['DEBUG'] = 'True'    # RELEASE: comment out

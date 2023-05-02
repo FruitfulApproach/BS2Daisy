@@ -26,9 +26,16 @@ class ViewGenerator(CodeGenerator):
    def template_path(self):
       full_path = self.export_mapper.django_output_file_mapping(self.input_file)
       rel_path = self.export_mapper.filename_rel_root(filename=full_path, root=self.django_project_root)
-      if rel_path.startswith('templates\\'):
-         rel_path = rel_path[len('templates\\'):]
-      return rel_path      
+      parts = rel_path.split(sep=os.sep)
+      
+      if parts[0] == 'templates':
+         rel_path =  "/".join(parts[1:])
+      elif parts[1] == 'templates':
+         rel_path = "/".join(parts[2:])
+      else:
+         rel_path = "/".join(parts)
+      
+      return rel_path  
    
    @property
    def view_name(self) -> str:
@@ -102,7 +109,10 @@ class ViewGenerator(CodeGenerator):
       module_path, module, attribs = self.get_boilerplate_attributes('views.py')  
       
       if function is None:
-         function = getattr(module, self.boilderplate_widget.current_boilerplate)
+         boilerplate = self.boilderplate_widget.current_boilerplate
+         if boilerplate == ' ' or not boilerplate:
+            return            
+         function = getattr(module, boilerplate)
          
       if name is None:
          name = self.export_mapper.django_view_name_mapping(self.input_file)
@@ -121,8 +131,9 @@ class ViewGenerator(CodeGenerator):
             
          source = f'\n{source}'
          
-         with open(module_path, 'a') as module_file:
-            module_file.write(source)
+         if module_path:
+            with open(module_path, 'a') as module_file:
+               module_file.write(source)
             
               
    def filename_line_number_of_function(self, function_name:str, create:bool=True):
