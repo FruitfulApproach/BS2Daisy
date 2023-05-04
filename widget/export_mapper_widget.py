@@ -217,12 +217,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             rel_path = os.path.join(bss_root, parts[0])
             
             if os.path.isdir(rel_path):
-               folder_name = parts[0]
-               
-               if len(parts) > 1:
-                  return os.path.join(folder_name, 'templates', *parts)
-               else:
-                  return os.path.join(folder_name, 'templates')
+               return os.path.join('templates', *parts)
                
             elif os.path.isfile(rel_path):
                return os.path.join('templates', *parts[0:])
@@ -272,7 +267,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                folder_name = parts[0]
                
                if len(parts) > 1:
-                  return standard_path(self.remove_dot_html(os.path.join(folder_name, *parts[1:])))
+                  return standard_path(self.remove_dot_html(os.path.join(*parts[1:])))
                else:
                   return standard_path(folder_name)
                
