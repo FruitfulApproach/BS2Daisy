@@ -33,7 +33,8 @@ class TagConverter:
       with open(self._filename) as htmlstream:
          self._bs = BeautifulSoup(htmlstream.read().encode(), 'html.parser')
          
-      self.remove_for_data()   
+      self.remove_for_data()
+      self.replace_include_tag()
       
       for tag in self.ENCLOSED_TAG:
          self.extend_tag(tag, before=True, after=True)
@@ -59,7 +60,19 @@ class TagConverter:
       Remove extra tag used to simulate for loop content.
       """
       for element in self.beautiful_soup.select(f'[dj-for-data]'):
-         element.extract()   
+         element.extract()
+         
+   def replace_include_tag(self):
+      """
+      Replace html attribute from bss to django template tag.
+      Used for tag with opening and closing part : if, for, block, etc.
+      """
+      for element in self.beautiful_soup.select(f'[dj-include]'):
+         #Create content of django template tag
+         #with value in html tags attributes
+         attribute_value = element.attrs.pop('dj-include')
+         replacement_tag = f"{{% include '{attribute_value}' %}}"
+         element.replace_with(replacement_tag)         
          
    @property
    def beautiful_soup(self):

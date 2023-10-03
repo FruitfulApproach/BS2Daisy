@@ -1,1 +1,1 @@
-C:\Program Files (x86)\Wing Pro 8\wingdb.exe
+C:\Program Files\Wing Pro 9\wingdb.exe

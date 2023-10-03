@@ -47,7 +47,10 @@ class FileConverter:
                if not os.path.exists(directory):
                   os.makedirs(directory)
                shutil.copyfile(self._infile, self.output_file)
-         elif self._processOption == 'BSS to Django':         
+         elif self._processOption == 'BSS to Django':
+            if 'login.html' in self.input_file :
+               print("DEBUG ME")
+               
             tag_converter = TagConverter(self.input_file, self.export_mapper, thread)
             
             with open(self.output_file, 'w') as output_file:
