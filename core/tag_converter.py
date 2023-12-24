@@ -11,7 +11,8 @@ import html
 class TagConverter:
    #Define different type of tag behavior
    ENCLOSED_TAG = ["for", "if", "block"]
-   OPEN_TAG = ["load"]
+   #OPEN_TAG = ["load"]
+   REPLACE_TAG = ["load"]
    TAG_LINK = ["a", "script", "img", "link", "iframe"]
    
    def __init__(self, filename:str, export_mapper:ExportMapperWidget, thread:core.exporter_thread.ExporterThread):
@@ -39,8 +40,8 @@ class TagConverter:
       for tag in self.ENCLOSED_TAG:
          self.extend_tag(tag, before=True, after=True)
    
-      for tag in self.OPEN_TAG:
-         self.extend_tag(tag, before=True)
+      for tag in self.REPLACE_TAG:
+         self.extend_tag(tag)
    
       for tag in self.TAG_LINK:
          self.replace_links(tag)      
@@ -96,7 +97,10 @@ class TagConverter:
          if before:
             element.insert_before(open_tag)
          if after:
-            element.insert_after(close_tag)      
+            element.insert_after(close_tag)
+            
+         if not (before or after):
+            element.replace_with(open_tag)
    
    def convert_bss_link(self, file_link):
       django_link = self.export_mapper.django_template_url(file_link)      
