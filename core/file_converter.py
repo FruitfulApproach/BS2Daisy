@@ -48,12 +48,9 @@ class FileConverter:
                   os.makedirs(directory)
                shutil.copyfile(self._infile, self.output_file)
          elif self._processOption == 'BSS to Django':
-            if 'login.html' in self.input_file :
-               print("DEBUG ME")
-               
             tag_converter = TagConverter(self.input_file, self.export_mapper, thread)
             
-            with open(self.output_file, 'w') as output_file:
+            with open(self.output_file, 'w', encoding='utf8') as output_file:
                output_file.write(tag_converter.convert())
                
             code_gen:CodeGenerationWidget = self.export_mapper.code_generation_mapping(bss_file=self.input_file)
