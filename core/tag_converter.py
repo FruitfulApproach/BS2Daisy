@@ -31,15 +31,9 @@ class TagConverter:
       return self._exportMapper
       
    def convert(self):
-<<<<<<< .mine
       with open(self._filename, 'r', encoding='utf8') as htmlstream:
          data = htmlstream.read()
          self._bs = BeautifulSoup(data, 'html.parser')
-=======
-      with open(self._filename, encoding='utf8') as htmlstream:
-         self._bs = BeautifulSoup(htmlstream.read(), 'html.parser')
-
->>>>>>> .theirs
          
       self.remove_for_data()
       self.replace_include_tag()
