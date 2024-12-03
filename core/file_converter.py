@@ -53,7 +53,7 @@ class FileConverter:
                
             tag_converter = TagConverter(self.input_file, self.export_mapper, thread)
             
-            with open(self.output_file, 'w') as output_file:
+            with open(self.output_file, 'w', encoding='utf8') as output_file:
                output_file.write(tag_converter.convert())
                
             code_gen:CodeGenerationWidget = self.export_mapper.code_generation_mapping(bss_file=self.input_file)
