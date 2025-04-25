@@ -137,3 +137,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 output
+/test_projects/abalien/assets

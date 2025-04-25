@@ -1,0 +1,87 @@
+#!wing
+#!version=10.0
+##################################################################
+# Wing project file                                              #
+##################################################################
+[project attributes]
+console.toolbox = [{'autosave': False,
+                    'entry_point': 'Collect Static Files',
+                    'id': 'cmd-J5AlYK0V6fRSB5lL',
+                    'io_encoding': None,
+                    'key_binding': None,
+                    'line_mode': True,
+                    'pseudo_tty': False,
+                    'raise_panel': True,
+                    'shared': False,
+                    'title': 'Collect Static Files'}]
+debug.launch-configs = (2,
+                        {'launch-8CBqACP6z2yRuzEt': ({'shared': True},
+        {'buildcmd': ('project',
+                      ('cmd-9RW4nCSCHgyK8Moq',
+                       'Run Django Externally')),
+         'env': ('project',
+                 ['']),
+         'name': 'Run Django Server',
+         'pyexec': ('default',
+                    ''),
+         'pypath': ('project',
+                    []),
+         'pyrunargs': ('project',
+                       '-u'),
+         'runargs': 'runserver 0.0.0.0:8000',
+         'rundir': ('project',
+                    '')}),
+                         'launch-HRfn5o2bIYgOnRmC': ({'shared': True},
+        {'buildcmd': ('project',
+                      ('cmd-9RW4nCSCHgyK8Moq',
+                       'Run Django Externally')),
+         'env': ('project',
+                 ['']),
+         'name': 'Run Django Server',
+         'pyexec': ('remote',
+                    'raspi4'),
+         'pypath': ('project',
+                    []),
+         'pyrunargs': ('project',
+                       '-u'),
+         'runargs': 'runserver 0.0.0.0:8006',
+         'rundir': ('project',
+                    '')}),
+                         'launch-N5FZqMo6HWSB7P8N': ({},
+        {'buildcmd': ('project',
+                      ('',
+                       '')),
+         'env': ('project',
+                 []),
+         'name': 'Run Django Server',
+         'pyexec': ('project',
+                    ''),
+         'pypath': ('project',
+                    []),
+         'pyrunargs': ('project',
+                       '-u'),
+         'runargs': 'runserver 0.0.0.0:8000',
+         'rundir': ('project',
+                    '')})})
+debug.named-entry-points = (1,
+                            {'Collect Static Files': ({},
+        {'auto-show': True,
+         'launch-id': ('project',
+                       ('collectstatic --noinput',
+                        '')),
+         'loc': loc('manage.py')})})
+proj.debug-sub-processes = True
+proj.directory-list = [{'dirloc': loc('.'),
+                        'excludes': ['db.sqlite3'],
+                        'filter': '*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
+proj.file-type = 'shared'
+proj.launch-config = {loc('manage.py'): ('custom',
+        ('',
+         'launch-N5FZqMo6HWSB7P8N'))}
+proj.main-file = loc('manage.py')
+proj.ptype = 'django'
+testing.test-framework = {None: ':internal djangotest',
+                          loc('manage.py'): ':internal djangotest'}
