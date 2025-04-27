@@ -12,12 +12,15 @@ proj.directory-list = [{'dirloc': loc('.'),
                         'watch_for_changes': True}]
 proj.file-type = 'shared'
 proj.launch-config = {loc('bss_to_django.py'): ('project',
-        ('C:\\Users\\fruit\\OneDrive\\Desktop\\Code\\WebDev\\ArrowBee\\ArrowBeeDesign\\BSSExport',
-         '')),
+        ('C:\\Users\\fruit\\OneDrive\\Desktop\\BSStoDjangoAjaxStubs\\test_projects\\abalien\\bss_export',
+         'launch-8CBqACP6z2yRuzEt')),
                       loc('converter.py'): ('project',
         ('../DiagramChaseDatabase/BSSExport',
          '')),
+                      loc('core/ast/django_url_injector.py'): ('project',
+        ('',
+         'launch-8CBqACP6z2yRuzEt')),
                       loc('dev_bss_to_django.py'): ('project',
         ('BSSExport',
          ''))}
-proj.main-file = loc('bss_to_django.py')
+proj.main-file = loc('core/ast/django_url_injector.py')

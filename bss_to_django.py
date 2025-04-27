@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 import sys
 from dialog.main_window import MainWindow
 import os
@@ -21,4 +21,4 @@ if __name__ == '__main__':
    else:
       main_window = MainWindow.try_loading_config_from_arg()
    
-   sys.exit(app.exec_())
+   sys.exit(app.exec())

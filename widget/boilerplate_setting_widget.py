@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QComboBox, QToolButton, QHBoxLayout, QLabel
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QWidget, QComboBox, QToolButton, QHBoxLayout, QLabel
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QIcon
 import widget.code_generation_widget
 import os
 from code_gen.code_generator import CodeGenerator
@@ -23,7 +23,7 @@ class BoilerplateSettingWidget(QWidget):
       self._jumpToCodeButton.setEnabled(False)
       self.setLayout(QHBoxLayout())
       label = QLabel(f'{generator.type_name}:')
-      label.setAlignment(Qt.AlignRight)
+      label.setAlignment(Qt.AlignmentFlag.AlignRight)
       self.layout().addWidget(label)
       self.layout().addWidget(self._boilerplateCombo)
       self.layout().addWidget(self._jumpToCodeButton)

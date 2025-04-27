@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog
 from ui.ui_main_window import Ui_MainWindow
 import _pickle as pickle
 import os
 import sys
-from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QDesktopServices
+from PyQt6.QtCore import QUrl
+from PyQt6.QtGui import QDesktopServices
 from datetime import datetime
 from widget.export_mapper_widget import ExportMapperWidget
 from core.exporter_thread import ExporterThread

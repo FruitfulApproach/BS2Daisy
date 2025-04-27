@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from widget.boilerplate_setting_widget import BoilerplateSettingWidget
 import widget.export_mapper_widget
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import pyqtSignal, Qt
 import os
 from code_gen.code_generator import CodeGenerator
 from code_gen.view_generator import ViewGenerator

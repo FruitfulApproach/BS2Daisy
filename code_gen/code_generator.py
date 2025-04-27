@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt6.QtCore import pyqtSignal, QObject
 from glob import glob
 import importlib
 import sys
@@ -184,7 +184,7 @@ class CodeGenerator(QObject):
    
       
 if __name__ == '__main__':
-   from PyQt5.QtWidgets import QApplication
+   from PyQt6.QtWidgets import QApplication
    app = QApplication([])
 
    def test_view(request):

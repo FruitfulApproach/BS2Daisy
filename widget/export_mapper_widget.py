@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QTreeWidget
+from PyQt6.QtWidgets import (QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QTreeWidget,
+                             QHeaderView)
 from ui.ui_export_mapper_widget import Ui_ExportMapperWidget
 import os
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtGui import QPixmap
 from datetime import datetime
 from core.tools import standard_path
 import stringcase
@@ -36,6 +37,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       self._bssFileToTreeItem = {}     
       self._bssDesignExport = None
       self._djangoRoot = None
+      self.tree.header().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
       
       if not pickled:
          self._bssFileSet = set()
