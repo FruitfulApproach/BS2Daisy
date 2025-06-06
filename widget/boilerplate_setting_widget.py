@@ -8,6 +8,7 @@ from code_gen.view_generator import ViewGenerator
 
 class BoilerplateSettingWidget(QWidget):
    status_message_signal = pyqtSignal(str)
+   error_message_signal = pyqtSignal(str)
    jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    def __init__(self, input_file:str, code_gen_widget, generator:CodeGenerator, pickled=False):
@@ -53,6 +54,8 @@ class BoilerplateSettingWidget(QWidget):
       self._boilerplateCombo.currentTextChanged.connect(lambda text: self._jumpToCodeButton.setEnabled(text != ' '))
       self.code_generator.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line_requested.emit)
       self.code_generator.set_boilerplate_widget(self)
+      self.code_generator.status_message_signal.connect(self.status_message_signal.emit)
+      self.code_generator.error_message_signal.connect(self.error_message_signal.emit)
         
    def populate_combo_box(self, init:bool=False):
       self.set_boilerplates(self.code_generator.list_boilerplates())

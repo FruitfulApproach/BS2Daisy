@@ -11,8 +11,7 @@ from widget.code_generation_widget import CodeGenerationWidget
 from code_gen.view_generator import ViewGenerator
 
 class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
-   bss_to_django_folder = 'BSSToDjango'
-   boilerplates_folder = 'DjangoBoilerplates'
+   boilerplates_folder = 'boilerplates'
    
    bss_assets_subfolders = {'bootstrap', 'js', 'css', 'img'}
    default_ignore_bss_files = {'error.log', '.bss-to-django-config.pkl'}
@@ -24,6 +23,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    file_moved_or_deleted = pyqtSignal(str)
    file_added = pyqtSignal(str)
    status_message_signal = pyqtSignal(str)
+   error_message_signal = pyqtSignal(str)
    jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    InputFile, FileChanges, ProcessOption, OutputFile, DjangoURL, DjangoView, CodeGeneration = range(7)
@@ -311,7 +311,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    def django_project_root(self):
       return self._djangoRoot
    
-   def django_output_file_mapping(self, bss_file:str):        
+   def django_output_file_mapping(self, bss_file:str):
       item = self._bssFileToTreeItem[bss_file]
       outfile = self.tree.itemWidget(item, self.OutputFile)
       outfile = outfile.text()
@@ -550,7 +550,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          django_url = standard_path(self.remove_dot_html(django_url))
          return django_url
       else:
-         self.status_message_signal.emit(f"Broken link detected on the BSS side. Did you create {bss_filename} yet?")
+         self.error_message_signal.emit(f"Broken link detected on the BSS side. Did you create {bss_filename} yet?")
          return bss_filename
    
    def remove_dot_html(self, filename:str):
@@ -577,6 +577,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    
    def connect_code_generation_widget(self, code_gen_widget:CodeGenerationWidget):
       code_gen_widget.status_message_signal.connect(self.status_message_signal.emit)
+      code_gen_widget.error_message_signal.connect(self.error_message_signal.emit)
       code_gen_widget.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line_requested.emit)
       
    def jump_to_boilerplates(self, filename:str):

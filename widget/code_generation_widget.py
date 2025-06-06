@@ -9,6 +9,7 @@ from code_gen.view_generator import ViewGenerator
 class CodeGenerationWidget(QWidget):
    indent_setting:int = 3
    status_message_signal = pyqtSignal(str)
+   error_message_signal = pyqtSignal(str)
    jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    View = range(1)
@@ -44,6 +45,7 @@ class CodeGenerationWidget(QWidget):
       
       for widget in self._boilerplateWidgets:
          widget.status_message_signal.connect(self.status_message_signal.emit)
+         widget.error_message_signal.connect(self.error_message_signal.emit)
          self.layout().addWidget(widget)
          widget.jump_to_code_file_line_requested.connect(lambda file, line, widget=widget: self.jump_to_code_file_line_requested.emit(file, line))
    

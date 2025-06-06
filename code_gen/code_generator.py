@@ -9,6 +9,7 @@ import re
 
 class CodeGenerator(QObject):
    status_message_signal = pyqtSignal(str)
+   error_message_signal = pyqtSignal(str)
    jump_to_code_file_line_requested = pyqtSignal(str, int)
    
    def __init__(self, code_gen_widget, pickled=False):
@@ -104,11 +105,14 @@ class CodeGenerator(QObject):
    def module_attributes(self, *args):
       try:            
          module_path = os.path.join(*args)
+         if not os.path.exists(module_path):
+            with open(module_path, 'w') as module_file:
+               module_file.write(f'# {os.path.basename(module_path)}')
          module = self.load_module_with_path(module_path)
          attribs = dir(module)
          return module_path, module, attribs
       except Exception as e:
-         self.status_message_signal.emit(str(e))
+         self.error_message_signal.emit(str(e))
          return None, None, []
       
    func_def_name_regex = re.compile(r"(?P<prefix>.*def\s+)(?P<name>[a-zA-Z_][a-zA-Z_0-9]*)(?P<suffix>\s*\(.*\)\s*:.*)", flags=re.DOTALL)
@@ -157,7 +161,7 @@ class CodeGenerator(QObject):
       return self.__class__.__name__[:-len('Generator')]
    
    def get_boilerplate_attributes(self, base_file:str):
-      return self.module_attributes(self.django_project_root, self.export_mapper.bss_to_django_folder, self.export_mapper.boilerplates_folder, base_file)      
+      return self.module_attributes(self.django_project_root, self.export_mapper.boilerplates_folder, base_file)      
       
    @property
    def django_project_root(self):
@@ -183,19 +187,19 @@ class CodeGenerator(QObject):
       return self._boilerPlateWidget
    
       
-if __name__ == '__main__':
-   from PyQt6.QtWidgets import QApplication
-   app = QApplication([])
+#if __name__ == '__main__':
+   #from PyQt6.QtWidgets import QApplication
+   #app = QApplication([])
 
-   def test_view(request):
-      print(request)
+   #def test_view(request):
+      #print(request)
    
-   code_gen = CodeGenerator(django_root='../../DiagramChaseDatabase', app_folder='DiagramChaseDatabase', indent=8)
-   module = code_gen.load_module_with_path(module_path='../../DiagramChaseDatabase/DiagramChaseDatabase/views.py')   
-   code_gen.output_code(test_view)
-   code = inspect.getsource(test_view)
-   code1 = code_gen.tabify_code(code)
-   print(code1)
-   print(module)
+   #code_gen = CodeGenerator(django_root='../test/django_project', app_folder='django_project', indent=8)
+   #module = code_gen.load_module_with_path(module_path='../test/django_project/django_project/views.py')   
+   #code_gen.output_code(test_view)
+   #code = inspect.getsource(test_view)
+   #code1 = code_gen.tabify_code(code)
+   #print(code1)
+   #print(module)
    
-   sys.exit(app.exec_())
+   #sys.exit(app.exec_())

@@ -41,12 +41,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
    def finish_setup(self):      
       self.tabs.insertTab(1, self._exportMapper, "Export Mapping")
       self.export_mapper.file_added.connect(self.prompt_user_about_new_file)
-      self.export_mapper.status_message_signal.connect(lambda msg: self.log_status_message(msg, 5000))
+      self.export_mapper.status_message_signal.connect(lambda msg: self.log_status_message(msg, 10000))
+      self.export_mapper.error_message_signal.connect(self.log_error_message)
       self.export_mapper.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line)
 
       if self.export_mapper.bss_design_root is None:
          if len(sys.argv) < 2:
-            self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 5000)
+            self.log_status_message('This app called without a command line argument. See the Getting Started tab.', 10000)
             self.tabs.setCurrentWidget(self.gettingStartedTab)
          else:
             if not os.path.exists(sys.argv[1]):
@@ -55,7 +56,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
             if os.path.isdir(sys.argv[1]):
                bss_root = standard_path(os.path.abspath(sys.argv[1]), os.sep)
                self.export_mapper.set_bss_root(bss_root)
-               self.log_status_message(f'This app called with argument {os.path.relpath(bss_root)}.', 5000, 'color:blue')
+               self.log_status_message(f'This app called with argument {os.path.relpath(bss_root)}.', 10000, 'color:blue')
                self.tabs.setCurrentWidget(self._exportMapper)
             else:
                self.log_status_message(f"{sys.argv[1]} is not a directory.", 10000, 'color:red')      
@@ -88,6 +89,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          self.statusBar().setStyleSheet(f'{self._baseStatusCSS};{extra_css};')      
       else:
          self.statusBar().setStyleSheet(self._baseStatusCSS)
+         
+   def log_error_message(self, msg: str):
+      self.log_status_message(msg, -1, "color:darkorange");
       
    def browse_for_django_project_clicked(self):
       folder = QFileDialog.getExistingDirectory(parent=self, directory='.')
@@ -97,7 +101,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
       
    def copy_exe_filename_clicked(self):
       QApplication.clipboard().setText(self.exeFilenameLine.text())
-      self.statusBar().showMessage('EXE filename copied to clipboard!', 5000)
+      self.statusBar().showMessage('EXE filename copied to clipboard!', 10000)
    
    @staticmethod
    def load_last_session_or_new():
@@ -200,7 +204,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
    def _exportThreadFinished(self):
       self.runExporterButton.setEnabled(True)
       self.exportProgress.setValue(0)
-      self.log_status_message('Export completed with 0 errors (TODO)!', 5000, 'color:green')
+      self.log_status_message('Export completed with 0 errors (TODO)!', 10000, 'color:green')
    
    def file_converter_list(self) -> list:
       input_file_list = list(self.export_mapper.bss_input_files())
@@ -243,12 +247,13 @@ class MainWindow(Ui_MainWindow, QMainWindow):
          command = self.jumpToOtherCommandLine.text()
          
       command = command.format(file_path=filename, line_number=line_number)
-      os.system(command)
+      result = os.system(command)
+      print(result)
       
    def copy_status_log_to_clipboard(self):
       QApplication.clipboard().setText(self.statusLogText.toPlainText()) 
-      self.statusBar().showMessage('Status log copied to clipboard!', 5000)
+      self.statusBar().showMessage('Status log copied to clipboard!', 10000)
       
    def open_the_issues_forum_in_browser(self):
-      url = QUrl('https://github.com/enjoysmath/BootstrapStudioToDjango/issues')
+      url = QUrl('https://github.com/FruitfulApproach/BSStoDjangoAjaxStubs/issues')
       QDesktopServices.openUrl(url)

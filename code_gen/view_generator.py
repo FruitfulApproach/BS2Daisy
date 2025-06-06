@@ -59,7 +59,7 @@ class ViewGenerator(CodeGenerator):
          attrib = getattr(module, name)
          
          if callable(attrib):
-            args = inspect.getargspec(attrib).args
+            args = inspect.getfullargspec(attrib).args
             if args and args[0] == 'request':
                boilerplates.append(name)
                
@@ -110,7 +110,7 @@ class ViewGenerator(CodeGenerator):
       
       if function is None:
          boilerplate = self.boilderplate_widget.current_boilerplate
-         if boilerplate == ' ' or not boilerplate:
+         if boilerplate.strip() == '' or not boilerplate:
             return            
          function = getattr(module, boilerplate)
          
@@ -153,12 +153,16 @@ class ViewGenerator(CodeGenerator):
             return self.filename_line_number_of_function(function_name, create=False)
          
    def jump_to_code(self):
+      django_root = self.export_mapper.django_project_root      
+      if django_root is None:
+         self.error_message_signal.emit("Django project root not set. Go to the Getting Started tab to set it.")
+         return
       func_name = self.export_mapper.django_view_name_mapping(self.input_file)
       if func_name:
          filename, line_number = self.filename_line_number_of_function(func_name)      
          self.jump_to_code_file_line_requested.emit(filename, line_number)
       else:
-         self.status_message_signal.emit("Code not found. Try exporting first.")
+         self.error_message_signal.emit("Code not found. Try exporting first.")
          
    def get_boilerplate_source(self, function):
       source = inspect.getsource(function)
