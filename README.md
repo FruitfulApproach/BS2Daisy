@@ -1,4 +1,10 @@
-# Bootstrap Studio to Django
+# 🐂💩🌼 BS2DaisyStem 
+
+BS2DaisyStem = "Bootstrap Studio to Django, AI System"
+
+## Summary 
+Advanced 👽 technology.
+
 
 ## Current Development ToDo's:
 1. Remove bolding on Qt Designer
