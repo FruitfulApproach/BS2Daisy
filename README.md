@@ -1,5 +1,11 @@
 # Bootstrap Studio to Django
 
+## Current Development ToDo's:
+1. Remove bolding on Qt Designer
+2. Fix issue with icons & migrating to PyQt6
+3. Fix issue with image subfolder defaulting to Django destination subfolder/static/subfolder; should be static/subfolder
+4. Make auto-translations of page links such as /features.html to {% url 'features' %}, so that BSS site templates work right away.
+
 Exports a [Bootstrap Studio](https://bootstrapstudio.io/) design into a [Django](https://www.djangoproject.com/) project for an exhilerating low-code web design experience.    Allows you to write as much custom/critical code as you would like.
 
 *Credit: Improvement of [AbcSxyZ/bootstrap-studio-to-django-template](https://github.com/AbcSxyZ/bootstrap-studio-to-django-template)*
