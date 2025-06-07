@@ -1,6 +1,6 @@
-# 🌼 BS2DaisyStem 
+# 🌼 BS2Daisy
 
-BS2DaisyStem = "Bootstrap Studio to Django, AI System"
+BS2Daisy = "Bootstrap Studio to Django, AI System"
 
 ## Summary 
 Advanced 👽 technology.
