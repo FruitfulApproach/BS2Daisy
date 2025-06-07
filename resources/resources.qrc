@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="images">
+    <file>img/add-file24x24.png</file>
+    <file>img/bss-export-settings-screen.png</file>
+    <file>img/django.ico</file>
+    <file>img/django.svg</file>
+    <file>img/error-24x24.ico</file>
+    <file>img/export-mapper-screen.png</file>
+    <file>img/pencil-24x24.png</file>
+    <file>img/social-preview.png</file>
+    <file>img/success.ico</file>
+    <file>img/success.svg</file>
+    <file>img/success-24x24.ico</file>
+  </qresource>
+</RCC>

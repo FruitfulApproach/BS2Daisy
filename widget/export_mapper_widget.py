@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QWidget, QTreeWidgetItem, QLineEdit, QComboBox, QLabel, QApplication, QTreeWidget,
                              QHeaderView)
-from ui.ui_export_mapper_widget import Ui_ExportMapperWidget
+from ui.export_mapper_widget import Ui_ExportMapperWidget
 import os
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QPixmap

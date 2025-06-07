@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication, QFileDialog
-from ui.ui_main_window import Ui_MainWindow
+from ui.main_window import Ui_MainWindow
 import _pickle as pickle
 import os
 import sys
