@@ -5,16 +5,20 @@
 ##################################################################
 [project attributes]
 proj.directory-list = [{'dirloc': loc('.'),
-                        'excludes': ['ui',
-                                     'auto-py-to-exe-config.json',
-                                     'core/ast'],
+                        'excludes': ['.gitignore',
+                                     'resources.qrc',
+                                     'resources_rc.py',
+                                     'core/ast',
+                                     'LICENSE',
+                                     'ui',
+                                     'auto-py-to-exe-config.json'],
                         'filter': '*',
                         'include_hidden': False,
                         'recursive': True,
                         'watch_for_changes': True}]
 proj.file-type = 'shared'
 proj.launch-config = {loc('bss_to_django.py'): ('project',
-        ('C:\\Users\\fruit\\OneDrive\\Desktop\\BSStoDjangoAjaxStubs\\test\\django_project\\bss_export',
+        ('C:\\Users\\fruit\\OneDrive\\Desktop\\BSStoDjangoAjaxStubs\\test\\mathapp\\bss_export',
          'launch-8CBqACP6z2yRuzEt')),
                       loc('code_gen/url_generator.py'): ('project',
         ('',
