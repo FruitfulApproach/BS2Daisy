@@ -1,5 +1,6 @@
 import os
-
+from PyQt6.QtGui import QPixmap
+from importlib.resources import path
 
 def standard_path(filename:str, sep:str=None) -> str:
    if sep is None:
@@ -12,3 +13,6 @@ def standard_path(filename:str, sep:str=None) -> str:
    return path   
 
 
+def load_resource_pixmap(resource_path:str):
+   with path("resources.img", resource_path) as f_path:
+      return QPixmap(str(f_path))

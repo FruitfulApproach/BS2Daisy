@@ -9,6 +9,7 @@ from core.tools import standard_path
 import stringcase
 from widget.code_generation_widget import CodeGenerationWidget
 from code_gen.view_generator import ViewGenerator
+from core.tools import load_resource_pixmap
 
 class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
    boilerplates_folder = 'boilerplates'
@@ -129,7 +130,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          self.tree.addTopLevelItem(item)   
          
       change_label = QLabel()
-      change_label.setPixmap(QPixmap(':/images/img/icons/add-file24x24.png'))
+      change_label.setPixmap(load_resource_pixmap('add-file24x24.png'))
          
       self.tree.setItemWidget(item, self.ProcessOption, process_combo)   
       self.tree.setItemWidget(item, self.OutputFile, output_line)
@@ -463,8 +464,8 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
                self.tree.setItemWidget(item, self.CodeGeneration, code_generation)
             
             if self._lastExportTime is None or self.modification_date(item_path) > self._lastExportTime:
-               change_label = QLabel()
-               change_label.setPixmap(QPixmap(':/images/img/icons/pencil-24x24.png'))               
+               change_label = QLabel()              
+               change_label.setPixmap(load_resource_pixmap('pencil-24x24.png'))               
                self.tree.setItemWidget(item, self.FileChanges, change_label)
                
             self.tree_from_dict(t[self.TreeIndex], parent=item, path=item_path)
@@ -522,9 +523,9 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
          changes_label = QLabel()         
       
       if result == "success":
-         changes_label.setPixmap(QPixmap(':/images/img/icons/success-24x24.ico'))
+         changes_label.setPixmap(load_resource_pixmap('success-24x24.ico'))
       elif result == "error":
-         changes_label.setPixmap(QPixmap(':/images/img/icons/error-24x24.ico'))
+         changes_label.setPixmap(load_resource_pixmap('error-24x24.ico'))
          
       self.tree.setItemWidget(item, self.FileChanges, changes_label)
 

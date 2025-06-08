@@ -5,6 +5,7 @@ import widget.code_generation_widget
 import os
 from code_gen.code_generator import CodeGenerator
 from code_gen.view_generator import ViewGenerator
+from core.tools import load_resource_pixmap
 
 class BoilerplateSettingWidget(QWidget):
    status_message_signal = pyqtSignal(str)
@@ -16,7 +17,9 @@ class BoilerplateSettingWidget(QWidget):
       
       self._boilerplateCombo = QComboBox()
       self._jumpToCodeButton = QToolButton()
-      self._jumpToCodeButton.setIcon(QIcon(':/images/img/icons/pencil-24x24.png'))
+      icon = QIcon()
+      icon.addPixmap(load_resource_pixmap('pencil-24x24.png'))
+      self._jumpToCodeButton.setIcon(icon)
       self._jumpToCodeButton.clicked.connect(lambda: self.code_generator.jump_to_code())
       self._jumpToCodeButton.setMinimumHeight(28)
       self._jumpToCodeButton.setMinimumWidth(28)

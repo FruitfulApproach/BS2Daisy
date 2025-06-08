@@ -2,15 +2,15 @@ from PyQt6.QtWidgets import QApplication
 import sys
 from dialog.main_window import MainWindow
 import os
+from dotenv import load_dotenv
 
 # Bugfix: the taskbar icon issue:
 import ctypes
-myappid = 'BootstrapStudioToDjango' # arbitrary string
+myappid = 'BS2Daisy' # arbitrary string
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-os.environ['DEBUG'] = 'True'    # RELEASE: comment out
-
 if __name__ == '__main__':
+   load_dotenv() 
    app = QApplication([])
 
    if len(sys.argv) == 1:
