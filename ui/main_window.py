@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.tabs = QtWidgets.QTabWidget(parent=self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
-        font.setBold(True)
+        font.setBold(False)
         self.tabs.setFont(font)
         self.tabs.setObjectName("tabs")
         self.gettingStartedTab = QtWidgets.QWidget()
@@ -110,7 +110,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtWidgets.QToolBox(parent=self.settingsPage)
         font = QtGui.QFont()
         font.setPointSize(9)
-        font.setBold(True)
+        font.setBold(False)
         self.toolBox.setFont(font)
         self.toolBox.setObjectName("toolBox")
         self.exportSettingsPage = QtWidgets.QWidget()
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.ItemRole.FieldRole, self.insertNewURLsAtCombo)
         self.toolBox.addItem(self.exportSettingsPage, "")
         self.jumpToCodePage = QtWidgets.QWidget()
-        self.jumpToCodePage.setGeometry(QtCore.QRect(0, 0, 732, 320))
+        self.jumpToCodePage.setGeometry(QtCore.QRect(0, 0, 858, 537))
         self.jumpToCodePage.setObjectName("jumpToCodePage")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.jumpToCodePage)
         self.gridLayout_4.setObjectName("gridLayout_4")
@@ -188,7 +188,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabs.setCurrentIndex(0)
-        self.toolBox.setCurrentIndex(0)
+        self.toolBox.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

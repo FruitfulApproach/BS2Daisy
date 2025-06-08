@@ -41,7 +41,7 @@
       <property name="font">
        <font>
         <family>Segoe UI Light</family>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="currentIndex">
@@ -222,11 +222,11 @@
           <property name="font">
            <font>
             <pointsize>9</pointsize>
-            <bold>true</bold>
+            <bold>false</bold>
            </font>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="exportSettingsPage">
            <property name="geometry">
@@ -269,8 +269,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>732</width>
-             <height>320</height>
+             <width>858</width>
+             <height>537</height>
             </rect>
            </property>
            <attribute name="label">

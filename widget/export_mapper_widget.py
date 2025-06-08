@@ -189,19 +189,19 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       if parts:
          if parts[0] == 'assets':
             if len(parts) > 1:
-               rel_path = os.path.join(bss_root, *parts[:2])
+               path = os.path.join(bss_root, *parts[:2])
                
-               if os.path.isdir(rel_path):
+               if os.path.isdir(path):
                   subfolder = parts[1]
                   
                   if subfolder in self.bss_assets_subfolders:
                      if subfolder != 'bootstrap':                        
                         if len(parts) > 2:
-                           rel_path = os.path.join(bss_root, *parts[:3])
-                           if os.path.isdir(rel_path):
+                           path = os.path.join(bss_root, *parts[:3])
+                           if os.path.isdir(path):
                               app_name = parts[2]
-                              return os.path.join(app_name, 'static', app_name, subfolder, *parts[3:])
-                           elif os.path.isfile(rel_path):
+                              return os.path.join('static', app_name, subfolder, *parts[3:])
+                           elif os.path.isfile(path):
                               return os.path.join('static', subfolder, *parts[2:])
                         else:
                            return os.path.join('static', subfolder)                    
@@ -216,12 +216,12 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
             else:
                return 'static'
          else:
-            rel_path = os.path.join(bss_root, parts[0])
+            path = os.path.join(bss_root, parts[0])
             
-            if os.path.isdir(rel_path):
+            if os.path.isdir(path):
                return os.path.join('templates', *parts)
                
-            elif os.path.isfile(rel_path):
+            elif os.path.isfile(path):
                return os.path.join('templates', *parts[0:])
       return "/"
             
