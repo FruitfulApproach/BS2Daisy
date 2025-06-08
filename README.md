@@ -15,6 +15,8 @@ Advanced 👽 technology.
 
 4. Make auto-translations of page links such as /features.html to {% url 'features' %}, so that BSS site templates work right away.
 
+5. Fix column stretch settings from within Qt Designer and init code of export mapper widget.  Right now column widths are fixed and non-adjustable.
+
 Exports a [Bootstrap Studio](https://bootstrapstudio.io/) design into a [Django](https://www.djangoproject.com/) project for an exhilerating low-code web design experience.    Allows you to write as much custom/critical code as you would like.
 
 *Credit: Improvement of [AbcSxyZ/bootstrap-studio-to-django-template](https://github.com/AbcSxyZ/bootstrap-studio-to-django-template)*

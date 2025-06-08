@@ -166,6 +166,6 @@ class ViewGenerator(CodeGenerator):
          
    def get_boilerplate_source(self, function):
       source = inspect.getsource(function)
-      source = source.format(template_path=f'"{self.template_path}"')
+      source = source.replace('template_name.html', self.template_path)
       return source
          

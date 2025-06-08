@@ -161,7 +161,7 @@ class CodeGenerator(QObject):
       return self.__class__.__name__[:-len('Generator')]
    
    def get_boilerplate_attributes(self, base_file:str):
-      return self.module_attributes(self.django_project_root, self.export_mapper.boilerplates_folder, base_file)      
+      return self.module_attributes(self.export_mapper.boilerplates_folder, base_file)      
       
    @property
    def django_project_root(self):

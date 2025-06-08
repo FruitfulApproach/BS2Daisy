@@ -582,7 +582,7 @@ class ExportMapperWidget(Ui_ExportMapperWidget, QWidget):
       code_gen_widget.jump_to_code_file_line_requested.connect(self.jump_to_code_file_line_requested.emit)
       
    def jump_to_boilerplates(self, filename:str):
-      self.jump_to_code_file_line_requested.emit(os.path.join(self.django_boilerplates_folder, filename), 1)
+      self.jump_to_code_file_line_requested.emit(os.path.join(self.boilerplates_folder, filename), 1)
 
    @property
    def absolute_bss_to_django_folder(self):
