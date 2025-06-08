@@ -7,15 +7,26 @@ Advanced 👽 technology.
 
 
 ## Current Development ToDo's:
-✅1. Remove bolding on Qt Designer
+0. Integrate MergeCode class into export process.
 
-✅2. Fix issue with icons & migrating to PyQt6
+1. Work on MergeCode algorithm.
+    A comprehensive-enough structural merge combining two sources.
+    * Python 
+    * Javascript
+    * HTML
+    * requirements.txt - check using stackoverflow methods (fastest) for library install, install with correct version if not
 
-✅3. Fix issue with image subfolder defaulting to Django destination subfolder/static/subfolder; should be static/subfolder
+2. Create some default boiler plates using ChatGPT free.
 
-4. Make auto-translations of page links such as /features.html to {% url 'features' %}, so that BSS site templates work right away.
+3. Work on AJAX / crispy form support & Bootstrap Studio special tag annotations.
 
-5. Fix column stretch settings from within Qt Designer and init code of export mapper widget.  Right now column widths are fixed and non-adjustable.
+4. Test BS2Daisy by building out a couple of parts of mathapp.
+
+5. Make auto-translations of page links such as /features.html to {% url 'features' %}, so that BSS site templates work right away.
+
+6. Fix column stretch settings from within Qt Designer and init code of export mapper widget.  Right now column widths are fixed and non-adjustable.
+
+7. Start work on ChatGPT support and purchase $20/month API access.
 
 Exports a [Bootstrap Studio](https://bootstrapstudio.io/) design into a [Django](https://www.djangoproject.com/) project for an exhilerating low-code web design experience.    Allows you to write as much custom/critical code as you would like.
 
